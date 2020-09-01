@@ -1,0 +1,12 @@
+{
+  "name": "native-firebase",
+  "displayName": "native-firebase",
+  "expo": {
+    "name": "native-firebase",
+    "slug": "native-firebase",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}

@@ -12,9 +12,9 @@ import {
 } from "react-native-paper";
 import { View, Text } from "react-native";
 import { theme } from "../core/theme";
-import DialogInput from "../components/DialogInput";
-import Background from "../components/Background";
+import TextInput from "../components/TextInput";
 import { Picker } from "@react-native-community/picker";
+import DialogInput from "../components/DialogInput";
 
 const itemsPerPage = 10;
 
@@ -35,10 +35,12 @@ const StockScreen = ({ navigation }) => {
   // Dialog Data State
   const [grade, setGrade] = useState("en-8");
   const [shape, setShape] = useState("square");
+  const [dia, setDia] = useState(0);
 
   // Selected State
-  const [selected, Select] = useState("");
+  const [selected, Select] = useState({ value: "", error: "" });
 
+  // Get Database Data
   database()
     .ref("/types")
     .on("value", (snapshot) => {
@@ -55,6 +57,7 @@ const StockScreen = ({ navigation }) => {
       setData(tempData);
     });
 
+  // Set Navbar
   navigation.setOptions({
     headerRight: () => (
       <View style={{ flexDirection: "row" }}>
@@ -67,6 +70,36 @@ const StockScreen = ({ navigation }) => {
       </View>
     ),
   });
+
+  //Upload Data
+  const onUploadType = async () => {
+    var key = database().ref("/types").push().key;
+
+    database()
+      .ref("/types")
+      .child(key)
+      .set({
+        grade: grade,
+        dia: dia.value,
+        shape: shape,
+      })
+      .catch((error) => {
+        setDia({ ...dia, error: error });
+      });
+
+    database()
+      .ref("/data")
+      .child(key)
+      .set({
+        full: 0,
+        part: [],
+      })
+      .catch((error) => {
+        setDia({ ...dia, error: error });
+      });
+
+    setVisible(false);
+  };
 
   return (
     <View>
@@ -95,11 +128,22 @@ const StockScreen = ({ navigation }) => {
                   <Picker.Item label="Square" value="square" />
                   <Picker.Item label="Round" value="round" />
                 </Picker>
+                <DialogInput
+                  label="Diameter"
+                  value={dia.value}
+                  onChangeText={(text) => setDia({ value: text, error: "" })}
+                  error={!!dia.error}
+                  errorText={dia.error}
+                  autoCapitalize="none"
+                  textContentType="none"
+                  keyboardType="decimal-pad"
+                />
               </View>
             </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialog}>Done</Button>
+            <Button onPress={onUploadType}>Done</Button>
+            <Button onPress={hideDialog}>Cancel</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -113,7 +157,6 @@ const StockScreen = ({ navigation }) => {
           return (
             <DataTable.Row
               key={item.key}
-              theme={theme}
               onPress={() => Select(item.key)}
               style={
                 selected === item.key

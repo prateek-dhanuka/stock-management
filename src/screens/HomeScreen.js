@@ -60,7 +60,7 @@ const HomeScreen = ({ route, navigation }) => {
 
   //Handle User state changes
   function onAuthStateChanged(user) {
-    navigation.navigate("Profile", { name: user.email });
+    navigation.navigate("Stock", { name: user.email });
   }
 
   useEffect(() => {

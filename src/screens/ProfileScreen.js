@@ -7,6 +7,7 @@ import Background from "../components/Background";
 const ProfileScreen = ({ route, navigation }) => {
   const { name } = route.params;
   const [data, setData] = useState([]);
+  const [selected, Select] = useState("");
 
   database()
     .ref("/types")
@@ -26,6 +27,7 @@ const ProfileScreen = ({ route, navigation }) => {
 
   return (
     <View>
+      <Text>{selected}</Text>
       <DataTable>
         <DataTable.Header>
           <DataTable.Title>Type</DataTable.Title>
@@ -35,7 +37,15 @@ const ProfileScreen = ({ route, navigation }) => {
         </DataTable.Header>
         {data.map((item) => {
           return (
-            <DataTable.Row key={item.key}>
+            <DataTable.Row
+              key={item.key}
+              onPress={() => Select(item.key)}
+              style={
+                item.key === selected
+                  ? { backgroundColor: "#0f0" }
+                  : { backgroundColor: "#fff" }
+              }
+            >
               <DataTable.Cell>{item.key}</DataTable.Cell>
               <DataTable.Cell>{item.shape}</DataTable.Cell>
               <DataTable.Cell>{item.dia}</DataTable.Cell>

@@ -42,13 +42,16 @@ const StockScreen = ({ navigation }) => {
   const showFilterDialog = () => setFilterDialogVisible(true)
   const hideFilterDialog = () => setFilterDialogVisible(false)
 
-  // Filter Dilaog Data
+  // Filter Dialog Data
   const [filterGrade, setFilterGrade] = useState('grade')
   const [filterShape, setFilterShape] = useState('shape')
   const [filterDia, setFilterDia] = useState('')
 
   // Selected State
   const [selected, Select] = useState('')
+
+  // Sort state
+  const [sortBy, SetSort] = useState({ heading: 'key', ascending: true })
 
   // Get Database Data
   useEffect(() => {
@@ -89,7 +92,33 @@ const StockScreen = ({ navigation }) => {
 
   //Handle Sorting of table
   const handleSort = (heading) => {
-    console.log(`clicked on ${heading}`)
+    if (sortBy.heading != heading) {
+      SetSort({ heading: heading, ascending: true })
+      console.log(`Sorting ${heading} in ascending order`)
+    } else {
+      if (sortBy.ascending) {
+        SetSort({ ...sortBy, ascending: false })
+        console.log(`Sorting ${heading} in descending order`)
+      } else {
+        console.log(`Stop sorting ${heading}`)
+        SetSort({ heading: 'key', ascending: true })
+      }
+    }
+
+    //TODO fix sort
+    var tempData = Object.values({ ...data })
+    console.log(typeof tempData)
+    tempData.sort((a, b) => {
+      var keyA = a[sortBy.heading]
+      var keyB = b[sortBy.heading]
+
+      if (sortBy.ascending) {
+        return keyA < keyB ? 1 : keyA > keyB ? -1 : 0
+      } else {
+        return keyA < keyB ? -1 : keyA > keyB ? 1 : 0
+      }
+    })
+    setData(tempData)
   }
 
   const filter = () => {
@@ -102,54 +131,12 @@ const StockScreen = ({ navigation }) => {
   return (
     <View>
       <Portal>
-        <Dialog visible={typeDialogVisible} onDismiss={hideTypeDialog}>
-          <Dialog.Title>Add Item</Dialog.Title>
-          <Dialog.Content>
-            <View>
-              <View style={{ flexDirection: 'column' }}>
-                <Text>Grade: </Text>
-                <Picker
-                  selectedValue={typeGrade}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setTypeGrade(itemValue)
-                  }>
-                  <Picker.Item label="EN-8" value="en-8" />
-                  <Picker.Item label="EN-19" value="en-19" />
-                  <Picker.Item label="MS" value="ms" />
-                </Picker>
-              </View>
-              <View style={{ flexDirection: 'column' }}>
-                <Text>Shape: </Text>
-                <Picker
-                  selectedValue={typeShape}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setTypeShape(itemValue)
-                  }>
-                  <Picker.Item label="Square" value="square" />
-                  <Picker.Item label="Round" value="round" />
-                </Picker>
-              </View>
-              <DialogInput
-                label="Diameter"
-                value={typeDia}
-                onChangeText={(text) => setTypeDia(text)}
-                error={false}
-                errorText={''}
-                autoCapitalize="none"
-                textContentType="none"
-                keyboardType="decimal-pad"
-              />
-            </View>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={onUploadData}>Done</Button>
-            <Button onPress={hideTypeDialog}>Cancel</Button>
-          </Dialog.Actions>
-        </Dialog>
+        {/* Filter Dialog */}
         <Dialog visible={filterDialogVisible} onDismiss={hideFilterDialog}>
           <Dialog.Title>Filter Data</Dialog.Title>
           <Dialog.Content>
             <View>
+              {/* Filter grade picker */}
               <View style={{ flexDirection: 'column' }}>
                 <Text>Grade: </Text>
                 <Picker
@@ -157,12 +144,13 @@ const StockScreen = ({ navigation }) => {
                   onValueChange={(itemValue, itemIndex) =>
                     setFilterGrade(itemValue)
                   }>
-                  <Picker.item label="Grade" value="grade" />
+                  <Picker.Item label="Grade" value="grade" />
                   <Picker.Item label="EN-8" value="en-8" />
                   <Picker.Item label="EN-19" value="en-19" />
                   <Picker.Item label="MS" value="ms" />
                 </Picker>
               </View>
+              {/* Filter shape picker */}
               <View style={{ flexDirection: 'column' }}>
                 <Text>Shape: </Text>
                 <Picker
@@ -170,11 +158,12 @@ const StockScreen = ({ navigation }) => {
                   onValueChange={(itemValue, itemIndex) =>
                     setFilterShape(itemValue)
                   }>
-                  <Picker.item label="Shape" value="shape" />
+                  <Picker.Item label="Shape" value="shape" />
                   <Picker.Item label="Square" value="square" />
                   <Picker.Item label="Round" value="round" />
                 </Picker>
               </View>
+              {/* Filter Dia text input */}
               <DialogInput
                 label="Diameter"
                 value={filterDia}
@@ -192,22 +181,122 @@ const StockScreen = ({ navigation }) => {
             <Button onPress={hideFilterDialog}>Cancel</Button>
           </Dialog.Actions>
         </Dialog>
+
+        {/* Type Dialog */}
+        <Dialog visible={typeDialogVisible} onDismiss={hideTypeDialog}>
+          <Dialog.Title>Add Item</Dialog.Title>
+          <Dialog.Content>
+            <View>
+              {/* Type grade picker */}
+              <View style={{ flexDirection: 'column' }}>
+                <Text>Grade: </Text>
+                <Picker
+                  selectedValue={typeGrade}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setTypeGrade(itemValue)
+                  }>
+                  <Picker.Item label="EN-8" value="en-8" />
+                  <Picker.Item label="EN-19" value="en-19" />
+                  <Picker.Item label="MS" value="ms" />
+                </Picker>
+              </View>
+              {/* Type shape picker */}
+              <View style={{ flexDirection: 'column' }}>
+                <Text>Shape: </Text>
+                <Picker
+                  selectedValue={typeShape}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setTypeShape(itemValue)
+                  }>
+                  <Picker.Item label="Square" value="square" />
+                  <Picker.Item label="Round" value="round" />
+                </Picker>
+              </View>
+              {/* Type dia text input */}
+              <DialogInput
+                label="Diameter"
+                value={typeDia}
+                onChangeText={(text) => setTypeDia(text)}
+                error={false}
+                errorText={''}
+                autoCapitalize="none"
+                textContentType="none"
+                keyboardType="decimal-pad"
+              />
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={onUploadData}>Done</Button>
+            <Button onPress={hideTypeDialog}>Cancel</Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
+      {/* Data table */}
       <DataTable theme={theme}>
         <DataTable.Header theme={theme}>
-          <DataTable.Title theme={theme} onPress={() => handleSort('Shape')}>
+          <DataTable.Title
+            theme={theme}
+            onPress={() => handleSort('Shape')}
+            sortDirection={
+              sortBy.heading === 'Shape'
+                ? sortBy.ascending
+                  ? 'ascending'
+                  : 'descending'
+                : ''
+            }
+            style={{ flex: 0.2 }}>
             Shape
           </DataTable.Title>
-          <DataTable.Title theme={theme} onPress={() => handleSort('Diameter')}>
-            Diameter
+          <DataTable.Title
+            theme={theme}
+            onPress={() => handleSort('Diameter')}
+            sortDirection={
+              sortBy.heading === 'Diameter'
+                ? sortBy.ascending
+                  ? 'ascending'
+                  : 'descending'
+                : ''
+            }
+            style={{ flex: 0.2 }}>
+            Dia
           </DataTable.Title>
-          <DataTable.Title theme={theme} onPress={() => handleSort('Grade')}>
+          <DataTable.Title
+            theme={theme}
+            onPress={() => handleSort('Grade')}
+            sortDirection={
+              sortBy.heading === 'Grade'
+                ? sortBy.ascending
+                  ? 'ascending'
+                  : 'descending'
+                : ''
+            }
+            style={{ flex: 0.3 }}>
             Grade
           </DataTable.Title>
-          <DataTable.Title theme={theme} onPress={() => handleSort('Full')}>
+          <DataTable.Title
+            theme={theme}
+            onPress={() => handleSort('Full')}
+            sortDirection={
+              sortBy.heading === 'Full'
+                ? sortBy.ascending
+                  ? 'ascending'
+                  : 'descending'
+                : ''
+            }
+            style={{ flex: 0.15 }}>
             Full
           </DataTable.Title>
-          <DataTable.Title theme={theme} onPress={() => handleSort('Partial')}>
+          <DataTable.Title
+            theme={theme}
+            onPress={() => handleSort('Partial')}
+            sortDirection={
+              sortBy.heading === 'Partial'
+                ? sortBy.ascending
+                  ? 'ascending'
+                  : 'descending'
+                : ''
+            }
+            style={{ flex: 0.15 }}>
             Partial
           </DataTable.Title>
         </DataTable.Header>
@@ -223,11 +312,21 @@ const StockScreen = ({ navigation }) => {
                   ? { backgroundColor: theme.colors.primary }
                   : {}
               }>
-              <DataTable.Cell theme={theme}>{item.shape}</DataTable.Cell>
-              <DataTable.Cell theme={theme}>{item.dia}</DataTable.Cell>
-              <DataTable.Cell theme={theme}>{item.grade}</DataTable.Cell>
-              <DataTable.Cell theme={theme}>{item.full}</DataTable.Cell>
-              <DataTable.Cell theme={theme}>{item.partial}</DataTable.Cell>
+              <DataTable.Cell theme={theme} style={{ flex: 0.2 }}>
+                {item.shape}
+              </DataTable.Cell>
+              <DataTable.Cell theme={theme} style={{ flex: 0.2 }}>
+                {item.dia}
+              </DataTable.Cell>
+              <DataTable.Cell theme={theme} style={{ flex: 0.3 }}>
+                {item.grade}
+              </DataTable.Cell>
+              <DataTable.Cell theme={theme} style={{ flex: 0.15 }}>
+                {item.full}
+              </DataTable.Cell>
+              <DataTable.Cell theme={theme} style={{ flex: 0.15 }}>
+                {item.partial}
+              </DataTable.Cell>
             </DataTable.Row>
           )
         })}

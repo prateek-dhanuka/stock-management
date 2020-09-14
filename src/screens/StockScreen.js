@@ -27,17 +27,22 @@ const StockScreen = ({ navigation }) => {
   const from = page * itemsPerPage
   const to = Math.min((page + 1) * itemsPerPage, data.length)
 
-  // Dialog State
-  const [visible, setVisible] = useState(false)
-  const showDialog = () => setVisible(true)
-  const hideDialog = () => setVisible(false)
+  // Add Type Dialog State
+  const [typeDialogVisible, setTypeDialogVisible] = useState(false)
+  const showTypeDialog = () => setTypeDialogVisible(true)
+  const hideTypeDialog = () => setTypeDialogVisible(false)
 
-  // Dialog Data State
+  // Type Dialog Data
   const [typeGrade, setTypeGrade] = useState('en-8')
   const [typeShape, setTypeShape] = useState('square')
   const [typeDia, setTypeDia] = useState(0)
 
-  //Filter Data State
+  // Filter Dialog State
+  const [filterDialogVisible, setFilterDialogVisible] = useState(false)
+  const showFilterDialog = () => setFilterDialogVisible(true)
+  const hideFilterDialog = () => setFilterDialogVisible(false)
+
+  // Filter Dilaog Data
   const [filterGrade, setFilterGrade] = useState('grade')
   const [filterShape, setFilterShape] = useState('shape')
   const [filterDia, setFilterDia] = useState('')
@@ -55,22 +60,22 @@ const StockScreen = ({ navigation }) => {
       .catch((error) => {
         console.error(error)
       })
-  }, [visible])
+  }, [typeDialogVisible])
 
   const handleMinus = () => {
     console.log('Pressed -')
-  }
-
-  const filter = () => {
-    console.log(`Filter!`)
   }
 
   // Set Navbar
   navigation.setOptions({
     headerRight: () => (
       <View style={{ flexDirection: 'row' }}>
-        <IconButton icon="filter-variant" size={20} onPress={filter} />
-        <IconButton icon="plus" size={20} onPress={showDialog} />
+        <IconButton
+          icon="filter-variant"
+          size={20}
+          onPress={showFilterDialog}
+        />
+        <IconButton icon="plus" size={20} onPress={showTypeDialog} />
         <IconButton icon="minus" size={20} onPress={handleMinus} />
       </View>
     ),
@@ -79,7 +84,7 @@ const StockScreen = ({ navigation }) => {
   //Upload Data Handler
   const onUploadData = async () => {
     await uploadData({ grade: typeGrade, dia: typeDia, shape: typeShape })
-    setVisible(false)
+    setTypeDialogVisible(false)
   }
 
   //Handle Sorting of table
@@ -87,10 +92,17 @@ const StockScreen = ({ navigation }) => {
     console.log(`clicked on ${heading}`)
   }
 
+  const filter = () => {
+    console.log(
+      `Filtering by Grade: ${filterGrade}, Shape: ${filterShape}, Dia: ${filterDia}`
+    )
+    hideTypeDialog()
+  }
+
   return (
     <View>
       <Portal>
-        <Dialog visible={visible} onDismiss={hideDialog}>
+        <Dialog visible={typeDialogVisible} onDismiss={hideTypeDialog}>
           <Dialog.Title>Add Item</Dialog.Title>
           <Dialog.Content>
             <View>
@@ -119,10 +131,10 @@ const StockScreen = ({ navigation }) => {
               </View>
               <DialogInput
                 label="Diameter"
-                value={typeDia.value}
-                onChangeText={(text) => setTypeDia({ value: text, error: '' })}
-                error={!!typeDia.error}
-                errorText={typeDia.error}
+                value={typeDia}
+                onChangeText={(text) => setTypeDia(text)}
+                error={false}
+                errorText={''}
                 autoCapitalize="none"
                 textContentType="none"
                 keyboardType="decimal-pad"
@@ -131,7 +143,53 @@ const StockScreen = ({ navigation }) => {
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={onUploadData}>Done</Button>
-            <Button onPress={hideDialog}>Cancel</Button>
+            <Button onPress={hideTypeDialog}>Cancel</Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog visible={filterDialogVisible} onDismiss={hideFilterDialog}>
+          <Dialog.Title>Filter Data</Dialog.Title>
+          <Dialog.Content>
+            <View>
+              <View style={{ flexDirection: 'column' }}>
+                <Text>Grade: </Text>
+                <Picker
+                  selectedValue={filterGrade}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setFilterGrade(itemValue)
+                  }>
+                  <Picker.item label="Grade" value="grade" />
+                  <Picker.Item label="EN-8" value="en-8" />
+                  <Picker.Item label="EN-19" value="en-19" />
+                  <Picker.Item label="MS" value="ms" />
+                </Picker>
+              </View>
+              <View style={{ flexDirection: 'column' }}>
+                <Text>Shape: </Text>
+                <Picker
+                  selectedValue={filterShape}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setFilterShape(itemValue)
+                  }>
+                  <Picker.item label="Shape" value="shape" />
+                  <Picker.Item label="Square" value="square" />
+                  <Picker.Item label="Round" value="round" />
+                </Picker>
+              </View>
+              <DialogInput
+                label="Diameter"
+                value={filterDia}
+                onChangeText={(text) => setFilterDia(text)}
+                error={false}
+                errorText={''}
+                autoCapitalize="none"
+                textContentType="none"
+                keyboardType="decimal-pad"
+              />
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={filter}>Done</Button>
+            <Button onPress={hideFilterDialog}>Cancel</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

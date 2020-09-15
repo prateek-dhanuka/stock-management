@@ -51,19 +51,41 @@ const StockScreen = ({ navigation }) => {
   const [selected, Select] = useState('')
 
   // Sort state
-  const [sortBy, SetSort] = useState({ heading: 'key', ascending: true })
+  const [sortBy, SetSort] = useState({ heading: '', ascending: true })
 
   // Get Database Data
   useEffect(() => {
     console.log(`Get data called`)
     getData()
       .then((data) => {
-        setData(data)
+        //Sort if required
+        if (sortBy.heading !== '') {
+          var tempData = []
+          for (var datum of data) {
+            tempData.push(datum)
+          }
+
+          tempData.sort((a, b) => {
+            var keyA = a[sortBy.heading]
+            var keyB = b[sortBy.heading]
+
+            if (sortBy.ascending) {
+              return keyA < keyB ? 1 : keyA > keyB ? -1 : 0
+            } else {
+              return keyA < keyB ? -1 : keyA > keyB ? 1 : 0
+            }
+          })
+
+          setData(tempData)
+        } else {
+          console.log(`Not sorting`)
+          setData(data)
+        }
       })
       .catch((error) => {
         console.error(error)
       })
-  }, [typeDialogVisible])
+  }, [typeDialogVisible, sortBy])
 
   const handleMinus = () => {
     console.log('Pressed -')
@@ -94,31 +116,15 @@ const StockScreen = ({ navigation }) => {
   const handleSort = (heading) => {
     if (sortBy.heading != heading) {
       SetSort({ heading: heading, ascending: true })
-      console.log(`Sorting ${heading} in ascending order`)
     } else {
       if (sortBy.ascending) {
         SetSort({ ...sortBy, ascending: false })
-        console.log(`Sorting ${heading} in descending order`)
       } else {
-        console.log(`Stop sorting ${heading}`)
-        SetSort({ heading: 'key', ascending: true })
+        SetSort({ heading: '', ascending: true })
       }
     }
 
-    //TODO fix sort
-    var tempData = Object.values({ ...data })
-    console.log(typeof tempData)
-    tempData.sort((a, b) => {
-      var keyA = a[sortBy.heading]
-      var keyB = b[sortBy.heading]
-
-      if (sortBy.ascending) {
-        return keyA < keyB ? 1 : keyA > keyB ? -1 : 0
-      } else {
-        return keyA < keyB ? -1 : keyA > keyB ? 1 : 0
-      }
-    })
-    setData(tempData)
+    console.log(sortBy)
   }
 
   const filter = () => {
@@ -236,9 +242,9 @@ const StockScreen = ({ navigation }) => {
         <DataTable.Header theme={theme}>
           <DataTable.Title
             theme={theme}
-            onPress={() => handleSort('Shape')}
+            onPress={() => handleSort('shape')}
             sortDirection={
-              sortBy.heading === 'Shape'
+              sortBy.heading === 'shape'
                 ? sortBy.ascending
                   ? 'ascending'
                   : 'descending'
@@ -249,9 +255,9 @@ const StockScreen = ({ navigation }) => {
           </DataTable.Title>
           <DataTable.Title
             theme={theme}
-            onPress={() => handleSort('Diameter')}
+            onPress={() => handleSort('dia')}
             sortDirection={
-              sortBy.heading === 'Diameter'
+              sortBy.heading === 'dia'
                 ? sortBy.ascending
                   ? 'ascending'
                   : 'descending'
@@ -262,9 +268,9 @@ const StockScreen = ({ navigation }) => {
           </DataTable.Title>
           <DataTable.Title
             theme={theme}
-            onPress={() => handleSort('Grade')}
+            onPress={() => handleSort('grade')}
             sortDirection={
-              sortBy.heading === 'Grade'
+              sortBy.heading === 'grade'
                 ? sortBy.ascending
                   ? 'ascending'
                   : 'descending'
@@ -275,9 +281,9 @@ const StockScreen = ({ navigation }) => {
           </DataTable.Title>
           <DataTable.Title
             theme={theme}
-            onPress={() => handleSort('Full')}
+            onPress={() => handleSort('full')}
             sortDirection={
-              sortBy.heading === 'Full'
+              sortBy.heading === 'full'
                 ? sortBy.ascending
                   ? 'ascending'
                   : 'descending'
@@ -288,9 +294,9 @@ const StockScreen = ({ navigation }) => {
           </DataTable.Title>
           <DataTable.Title
             theme={theme}
-            onPress={() => handleSort('Partial')}
+            onPress={() => handleSort('partial')}
             sortDirection={
-              sortBy.heading === 'Partial'
+              sortBy.heading === 'partial'
                 ? sortBy.ascending
                   ? 'ascending'
                   : 'descending'

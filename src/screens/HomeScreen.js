@@ -1,72 +1,73 @@
-import React, { useState, useEffect } from "react";
-import { Text } from "react-native-paper";
-import { View } from "react-native";
-import TextInput from "../components/TextInput";
-import Header from "../components/Header";
-import Button from "../components/Button";
-import Background from "../components/Background";
-import auth from "@react-native-firebase/auth";
-import { emailValidator, passwordValidator } from "../core/utils";
+import React, { useState, useEffect } from 'react'
+import { Text } from 'react-native-paper'
+import { View } from 'react-native'
+import TextInput from '../components/TextInput'
+import Header from '../components/Header'
+import Button from '../components/Button'
+import Background from '../components/Background'
+import auth from '@react-native-firebase/auth'
+import { emailValidator, passwordValidator } from '../core/utils'
 
 const HomeScreen = ({ route, navigation }) => {
   //Declare States here
-  const [email, setEmail] = useState({ value: "", error: "" });
-  const [password, setPassword] = useState({ value: "", error: "" });
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState({ value: '', error: '' })
+  const [password, setPassword] = useState({ value: '', error: '' })
+  const [loading, setLoading] = useState(false)
 
   // Set Options here
-  navigation.setOptions({ title: "Home screen", headerShown: false });
+  navigation.setOptions({ title: 'Home screen', headerShown: false })
 
   //Login pressed handler
   const onLoginPressed = async () => {
-    if (loading) return;
+    if (loading) return
 
-    const emailError = emailValidator(email.value);
-    const passwordError = passwordValidator(password.value);
+    const emailError = emailValidator(email.value)
+    const passwordError = passwordValidator(password.value)
 
     if (emailError || passwordError) {
-      setEmail({ ...email, error: emailError });
-      setPassword({ ...password, error: passwordError });
-      return;
+      setEmail({ ...email, error: emailError })
+      setPassword({ ...password, error: passwordError })
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
 
     auth()
       .signInWithEmailAndPassword(email.value, password.value)
       .then(() => {
-        console.log("Signed In!");
+        console.log('Signed In!')
       })
       .catch((error) => {
-        if (error.code === "auth/invalid-email") {
-          emailError = error.code;
-        } else if (error.code === "auth/user-disabled") {
-          emailError = error.code;
-        } else if (error.code === "auth/user-not-found") {
-          emailError = error.code;
-        } else if (error.code === "auth/wrong-password") {
-          passwordError = error.code;
+        if (error.code === 'auth/invalid-email') {
+          emailError = error.code
+        } else if (error.code === 'auth/user-disabled') {
+          emailError = error.code
+        } else if (error.code === 'auth/user-not-found') {
+          emailError = error.code
+        } else if (error.code === 'auth/wrong-password') {
+          passwordError = error.code
         } else {
-          console.error(error);
+          console.error(error)
         }
         if (emailError || passwordError) {
-          setEmail({ ...email, error: emailError });
-          setPassword({ ...password, error: passwordError });
+          setEmail({ ...email, error: emailError })
+          setPassword({ ...password, error: passwordError })
         }
-      });
+      })
 
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   //Handle User state changes
   function onAuthStateChanged(user) {
-    navigation.navigate("Stock", { name: user.email });
+    console.log(`Got user: ${JSON.stringify(user)}`)
+    navigation.navigate('Stock', { name: user.email })
   }
 
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
+    return subscriber
+  }, [])
 
   return (
     <Background>
@@ -75,7 +76,7 @@ const HomeScreen = ({ route, navigation }) => {
         label="Email"
         returnKeyType="next"
         value={email.value}
-        onChangeText={(text) => setEmail({ value: text, error: "" })}
+        onChangeText={(text) => setEmail({ value: text, error: '' })}
         error={!!email.error}
         errorText={email.error}
         autoCapitalize="none"
@@ -87,7 +88,7 @@ const HomeScreen = ({ route, navigation }) => {
         label="Password"
         returnKeyType="done"
         value={password.type}
-        onChangeText={(text) => setPassword({ value: text, error: "" })}
+        onChangeText={(text) => setPassword({ value: text, error: '' })}
         error={!!password.error}
         errorText={password.error}
         secureTextEntry
@@ -98,7 +99,7 @@ const HomeScreen = ({ route, navigation }) => {
         Login
       </Button>
     </Background>
-  );
-};
+  )
+}
 
-export default HomeScreen;
+export default HomeScreen

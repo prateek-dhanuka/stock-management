@@ -1,7 +1,12 @@
 import database from '@react-native-firebase/database'
 
-export async function getData() {
-  var typeSnapshot = await database().ref('/types').once('value')
+export async function getData(sortBy, filterBy) {
+  var ref = database().ref('/types')
+  if (sortBy.exists()) {
+    ref = ref.orderByChild(sortBy)
+  }
+
+  var typeSnapshot = await ref.once('value')
   var tempData = []
 
   if (typeSnapshot.exists()) {

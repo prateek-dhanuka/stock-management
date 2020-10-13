@@ -12,14 +12,13 @@ const TextInput = ({ errorText, ...props }) => (
       mode="flat"
       {...props}
     />
-    {errorText ? <Text style={styles.error}>{errorText}</Text> : null}
   </View>
 )
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginVertical: 12,
+    // marginVertical: 12,
   },
   input: {
     backgroundColor: theme.colors.surface,
@@ -28,7 +27,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: theme.colors.error,
     paddingHorizontal: 4,
-    paddingTop: 4,
   },
 })
 

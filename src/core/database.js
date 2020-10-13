@@ -1,73 +1,17 @@
 import database from '@react-native-firebase/database'
 
-export async function getData(sortBy, filterBy) {
-  var ref = database().ref('/types')
-  if (sortBy.exists()) {
-    ref = ref.orderByChild(sortBy)
+/**
+ *
+ * @param {String} grade
+ * @param {String} shape
+ * @param {number} dia
+ * @return {Object} Count, Weight and Estimated cost of particular variation
+ */
+export function getSummary(grade, shape, dia) {
+  //TODO implement databse functionality
+  return {
+    count: 100,
+    weight: 100,
+    cost: 100,
   }
-
-  var typeSnapshot = await ref.once('value')
-  var tempData = []
-
-  if (typeSnapshot.exists()) {
-    const childArray = []
-    typeSnapshot.forEach((child) => {
-      childArray.push(child)
-      return false
-    })
-    for (const child of childArray) {
-      var typeVal = await child.val()
-
-      var dataSnapshot = await database()
-        .ref(`/data/${child.key}`)
-        .once('value')
-
-      if (dataSnapshot.exists()) {
-        var dataVal = dataSnapshot.val()
-      }
-
-      if ('partial' in dataVal) {
-        dataVal.partialCount = dataVal.partial.length
-      } else {
-        dataVal.partialCount = 0
-      }
-
-      tempData.push({
-        key: child.key,
-        shape: typeVal.shape,
-        grade: typeVal.grade,
-        dia: typeVal.dia,
-        full: dataVal.full,
-        partial: dataVal.partialCount,
-      })
-    }
-  }
-  return tempData
-}
-
-export async function uploadData(data) {
-  var key = database().ref('/types').push().key
-
-  database()
-    .ref('/types')
-    .child(key)
-    .set({
-      grade: data.grade,
-      dia: data.dia.value,
-      shape: data.shape,
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-
-  database()
-    .ref('/data')
-    .child(key)
-    .set({
-      full: 0,
-      part: [],
-    })
-    .catch((error) => {
-      console.error(error)
-    })
 }

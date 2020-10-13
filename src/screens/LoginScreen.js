@@ -6,7 +6,7 @@ import Background from '../components/Background'
 import auth from '@react-native-firebase/auth'
 import { emailValidator, passwordValidator } from '../core/utils'
 
-const HomeScreen = ({ route, navigation }) => {
+const LoginScreen = ({ route, navigation }) => {
   //Declare States here
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
@@ -58,7 +58,7 @@ const HomeScreen = ({ route, navigation }) => {
 
   //Handle User state changes
   function onAuthStateChanged(user) {
-    navigation.navigate('Stock', { name: user.email })
+    navigation.navigate('Summary', { grade: null, shape: null, dia: null })
   }
 
   useEffect(() => {
@@ -99,4 +99,4 @@ const HomeScreen = ({ route, navigation }) => {
   )
 }
 
-export default HomeScreen
+export default LoginScreen

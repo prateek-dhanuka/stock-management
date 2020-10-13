@@ -38,6 +38,15 @@ const SummaryScreen = ({ route, navigation }) => {
     ),
   })
 
+  // Navigate to camera screens
+  const addItem = () => {
+    navigation.navigate('AddItemCam')
+  }
+
+  const removeItem = () => {
+    navigation.navigate('RemoveItemCam')
+  }
+
   //Filter Functions
   const filter = () => {
     hideDialog()
@@ -128,14 +137,16 @@ const SummaryScreen = ({ route, navigation }) => {
           style={styles.button}
           mode="contained"
           color="green"
-          contentStyle={{ height: 50 }}>
+          contentStyle={{ height: 50 }}
+          onPress={addItem}>
           Add Item
         </Button>
         <Button
           style={styles.button}
           mode="contained"
           color="red"
-          contentStyle={{ height: 50 }}>
+          contentStyle={{ height: 50 }}
+          onPress={removeItem}>
           Remove Item
         </Button>
       </View>

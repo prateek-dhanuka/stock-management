@@ -11,7 +11,7 @@ import {
 import Background from '../components/Background'
 import Header from '../components/Header'
 import DialogInput from '../components/DialogInput'
-import { headerTextGenerator } from '../core/utils'
+import { getSummaryHeader } from '../core/utils'
 import { getSummary } from '../core/database'
 
 const SummaryScreen = ({ route, navigation }) => {
@@ -26,7 +26,7 @@ const SummaryScreen = ({ route, navigation }) => {
   const [dia, setDia] = useState(null)
 
   // Header Text
-  const header_text = headerTextGenerator(route.params)
+  const header_text = getSummaryHeader(route.params)
 
   //Set Navbar
   navigation.setOptions({
@@ -40,11 +40,11 @@ const SummaryScreen = ({ route, navigation }) => {
 
   // Navigate to camera screens
   const addItem = () => {
-    navigation.navigate('AddItemCam')
+    navigation.navigate('Item', { type: 'add' })
   }
 
   const removeItem = () => {
-    navigation.navigate('RemoveItemCam')
+    navigation.navigate('Item', { type: 'remove' })
   }
 
   //Filter Functions

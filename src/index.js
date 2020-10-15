@@ -6,8 +6,7 @@ import database from '@react-native-firebase/database'
 
 import LoginScreen from './screens/LoginScreen'
 import SummaryScreen from './screens/SummaryScreen'
-import AddItemCamScreen from './screens/AddItemCamScreen'
-import RemoveItemCamScreen from './screens/RemoveItemCamScreen'
+import ItemScreen from './screens/ItemScreen'
 
 const Stack = createStackNavigator()
 
@@ -34,8 +33,7 @@ const Main = () => {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Summary" component={SummaryScreen} />
-        <Stack.Screen name="AddItemCam" component={AddItemCamScreen} />
-        <Stack.Screen name="RemoveItemCam" component={RemoveItemCamScreen} />
+        <Stack.Screen name="Item" component={ItemScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -8,7 +8,7 @@ import database from '@react-native-firebase/database'
  * @return {Object} Count, Weight and Estimated cost of particular variation
  */
 export function getSummary(grade, shape, dia) {
-  //TODO implement databse functionality
+  //TODO implement database functionality
   return {
     count: 100,
     weight: 100,

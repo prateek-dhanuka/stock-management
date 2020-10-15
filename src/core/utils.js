@@ -21,7 +21,7 @@ export const nameValidator = (name) => {
   return ''
 }
 
-export const headerTextGenerator = (params) => {
+export const getSummaryHeader = (params) => {
   var header_text = 'Summary'
   if (params.grade !== null || params.shape !== null || params.dia !== null) {
     header_text = ''
@@ -37,4 +37,26 @@ export const headerTextGenerator = (params) => {
     // header_text = header_text.slice(0, -1)
   }
   return header_text
+}
+
+export const getItemScreenColor = (type) => {
+  switch (type) {
+    case 'add':
+      return 'green'
+    case 'remove':
+      return 'red'
+    default:
+      return null
+  }
+}
+
+export const getItemHeader = (type) => {
+  switch (type) {
+    case 'add':
+      return 'Add Item'
+    case 'remove':
+      return 'Remove Item'
+    default:
+      return 'Item'
+  }
 }

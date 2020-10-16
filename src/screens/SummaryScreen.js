@@ -1,18 +1,19 @@
-import { Picker } from '@react-native-community/picker'
+import { Button, Dialog, IconButton, Portal } from 'react-native-paper'
 import React, { useState } from 'react'
-import { StyleSheet, View, Text } from 'react-native'
-import { Dialog, IconButton, Portal, Button } from 'react-native-paper'
+import { StyleSheet, Text, View } from 'react-native'
 import {
-  grades,
   grade_display,
-  shapes,
+  grades,
   shape_display,
+  shapes,
 } from '../assets/constants'
+
 import Background from '../components/Background'
-import Header from '../components/Header'
 import DialogInput from '../components/DialogInput'
-import { getSummaryHeader } from '../core/utils'
+import Header from '../components/Header'
+import { Picker } from '@react-native-community/picker'
 import { getSummary } from '../core/database'
+import { getSummaryHeader } from '../core/utils'
 
 const SummaryScreen = ({ route, navigation }) => {
   // Summary filter dialog state

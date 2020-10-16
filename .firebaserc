@@ -1,5 +1,6 @@
 {
   "projects": {
-    "work laptop": "stock-f8849"
+    "work laptop": "stock-f8849",
+    "default": "stock-f8849"
   }
 }

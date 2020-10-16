@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import TextInput from '../components/TextInput'
-import Header from '../components/Header'
-import Button from '../components/Button'
-import Background from '../components/Background'
-import auth from '@react-native-firebase/auth'
+import React, { useEffect, useState } from 'react'
 import { emailValidator, passwordValidator } from '../core/utils'
+
+import Background from '../components/Background'
+import Button from '../components/Button'
+import Header from '../components/Header'
+import TextInput from '../components/TextInput'
+import auth from '@react-native-firebase/auth'
 
 const LoginScreen = ({ route, navigation }) => {
   //Declare States here

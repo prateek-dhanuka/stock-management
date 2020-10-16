@@ -1,19 +1,20 @@
-import React from 'react'
-import { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
 import { Checkbox, Text } from 'react-native-paper'
-import { theme } from '../core/theme'
-import { Picker } from '@react-native-community/picker'
+import { StyleSheet, View } from 'react-native'
+import { getItemHeader, getItemScreenColor } from '../core/utils'
+import {
+  grade_display,
+  grades,
+  shape_display,
+  shapes,
+} from '../assets/constants'
+
 import Background from '../components/Background'
 import Button from '../components/Button'
+import { Picker } from '@react-native-community/picker'
+import React from 'react'
 import TextInput from '../components/TextInput'
-import { getItemScreenColor, getItemHeader } from '../core/utils'
-import {
-  grades,
-  grade_display,
-  shapes,
-  shape_display,
-} from '../assets/constants'
+import { theme } from '../core/theme'
+import { useState } from 'react'
 
 const ItemScreen = ({ route, navigation }) => {
   //Data state
@@ -39,9 +40,9 @@ const ItemScreen = ({ route, navigation }) => {
 
   // Submit function
   const handleSubmit = () => {
-    //TODO Add form verification
-    //TODO Add database intergration
-    //TODO Add length decoding capability
+    //TODO: Add form verification
+    //TODO: Add database integration
+    //TODO: Add length decoding capability
     console.log(
       `${route.params.type}ed the following item: ${shape} ${dia}${grade}. Full = ${isFull}. Count = ${count}. length = ${length}`
     )

@@ -16,11 +16,12 @@
       "grade": "", // Ex: en8, ms, en19
       "shape": "", // Ex: round, square
       "dia": number, // Diameter
-      "loc": "", // Where it is (location)
-      "cost": number, // Estimated price
+      "loc": "", // Location
+      "cost": number, // Estimated price (Optional)
       "count": number, // How many of these there are
-      "length": number, // 6000 in case of full
-      "origin": "" // Where the steel came from
+      "length": number, // -1 in case of full
+      "origin": "", // Where the steel came from
+      "color": "" // Color of the piece
     }
   },
   "valid": { // Use these to validate data

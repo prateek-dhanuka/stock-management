@@ -1,5 +1,3 @@
-import { grade_display, shape_display } from '../assets/constants'
-
 export const emailValidator = (email) => {
   const re = /\S+@\S+\.\S+/
 

@@ -1,12 +1,12 @@
-import React from "react";
-import { Provider } from "react-native-paper";
-import App from "./src";
-import { theme } from "./src/core/theme";
+import App from './src'
+import { Provider } from 'react-native-paper'
+import React from 'react'
+import { theme } from './src/core/theme'
 
 const Main = () => (
   <Provider theme={theme}>
     <App />
   </Provider>
-);
+)
 
-export default Main;
+export default Main

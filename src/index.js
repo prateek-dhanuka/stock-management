@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
+
 import { AppState } from 'react-native'
+import FilterScreen from './screens/FilterScreen'
+import LoginScreen from './screens/LoginScreen'
 import { NavigationContainer } from '@react-navigation/native'
+import SummaryScreen from './screens/SummaryScreen'
 import { createStackNavigator } from '@react-navigation/stack'
 import database from '@react-native-firebase/database'
-
-import LoginScreen from './screens/LoginScreen'
-import SummaryScreen from './screens/SummaryScreen'
-import ItemScreen from './screens/ItemScreen'
 
 const Stack = createStackNavigator()
 
@@ -33,7 +33,7 @@ const Main = () => {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Summary" component={SummaryScreen} />
-        <Stack.Screen name="Item" component={ItemScreen} />
+        <Stack.Screen name="Filter" component={FilterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

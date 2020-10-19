@@ -1,19 +1,10 @@
 import { Button, Dialog, IconButton, Portal } from 'react-native-paper'
 import React, { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import {
-  grade_display,
-  grades,
-  shape_display,
-  shapes,
-} from '../assets/constants'
 
 import Background from '../components/Background'
-import DialogInput from '../components/DialogInput'
-import GradeMenu from '../components/GradeMenu'
-import Header from '../components/Header'
-import { Picker } from '@react-native-community/picker'
-import ShapeMenu from '../components/ShapeMenu'
+import DiaInput from '../components/DiaInput'
+import ItemMenu from '../components/ItemMenu'
 import { getSummary } from '../core/database'
 import { getSummaryHeader } from '../core/utils'
 
@@ -49,15 +40,15 @@ const SummaryScreen = ({ route, navigation }) => {
 
   // Navigate to item screens
   const detailItem = () => {
-    navigation.navigate('Item', { type: 'detail' })
+    navigation.navigate('Filter', { type: 'detail' })
   }
 
   const addItem = () => {
-    navigation.navigate('Item', { type: 'add' })
+    navigation.navigate('Filter', { type: 'add' })
   }
 
   const removeItem = () => {
-    navigation.navigate('Item', { type: 'remove' })
+    navigation.navigate('Filter', { type: 'remove' })
   }
 
   //Filter Functions
@@ -83,18 +74,23 @@ const SummaryScreen = ({ route, navigation }) => {
           <Dialog.Title>Filter Summary</Dialog.Title>
           <Dialog.Content>
             <View>
-              <GradeMenu selected={selectedGrade} Select={SelectGrade} />
-              <ShapeMenu selected={selectedShape} Select={SelectShape} />
-              <DialogInput
-                label="Diameter"
-                value={dia}
-                onChangeText={(text) => setDia(text)}
-                autoCapitalize="none"
-                textContentType="none"
-                keyboardType="decimal-pad"
+              <ItemMenu
+                item="grade"
+                selected={selectedGrade}
+                Select={SelectGrade}
               />
-              <LocMenu selected={selectedLoc} Select={SelectLoc} />
-              <OriginMenu selected={selectedOrigin} Select={SelectOrigin} />
+              <ItemMenu
+                item="shape"
+                selected={selectedShape}
+                Select={SelectShape}
+              />
+              <DiaInput selected={dia} Select={setDia} />
+              <ItemMenu item="loc" selected={selectedLoc} Select={SelectLoc} />
+              <ItemMenu
+                item="origin"
+                selected={selectedOrigin}
+                Select={SelectOrigin}
+              />
             </View>
           </Dialog.Content>
           <Dialog.Actions>

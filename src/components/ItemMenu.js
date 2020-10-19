@@ -1,27 +1,38 @@
-import { Button, Divider, Menu } from 'react-native-paper'
+import { Divider, Menu } from 'react-native-paper'
 import React, { memo, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 
+import Button from './Button'
 import database from '@react-native-firebase/database'
+import { theme } from '../core/theme'
 
-const LocMenu = ({ selected, Select }) => {
+const ItemMenu = ({ item, selected, Select, color, mode }) => {
   // Visibility state
   const [visible, setVisible] = useState(false)
   const openMenu = () => setVisible(true)
   const closeMenu = () => setVisible(false)
 
-  const [validLocs, setValidLocs] = useState({})
+  // Valid grade state
+  const [validItems, setValidItems] = useState({})
 
-  // Get Locs from database once on load
+  // Get Grades from database once on load
   useEffect(() => {
     database()
-      .ref('/valid/locs')
+      .ref(`/valid/${item}s`)
       .once('value')
       .then((snapshot) => {
-        // console.log('Valid locs are ', snapshot.val())
-        setValidLocs(snapshot.val())
+        // console.log('Valid grades are ', snapshot.val())
+        setValidItems(snapshot.val())
       })
   }, [])
+
+  //Decode parameters
+  if (color === undefined) {
+    color = theme.colors.primary
+  }
+  if (mode === undefined) {
+    mode = 'outlined'
+  }
 
   return (
     <Menu
@@ -29,8 +40,13 @@ const LocMenu = ({ selected, Select }) => {
       onDismiss={closeMenu}
       style={styles.menu}
       anchor={
-        <Button onPress={openMenu} style={styles.button} mode="outlined">
-          {selected === null ? 'Select a loc' : selected}
+        <Button
+          onPress={openMenu}
+          style={styles.button}
+          contentStyle={styles.buttonContent}
+          mode={mode}
+          color={color}>
+          {selected === null ? `Select a ${item}` : selected}
         </Button>
       }>
       <Menu.Item
@@ -38,21 +54,21 @@ const LocMenu = ({ selected, Select }) => {
           Select(null)
           closeMenu()
         }}
-        title="Select a loc"
+        title={`Select a ${item}`}
       />
       <Divider style={styles.divider} />
-      {Object.keys(validLocs).map((loc) => {
-        const icon = validLocs[loc].icon
-        const text = validLocs[loc].text
+      {Object.keys(validItems).map((item) => {
+        const icon = validItems[item].icon
+        const text = validItems[item].text
         return (
           <Menu.Item
             onPress={() => {
-              Select(loc)
+              Select(item)
               closeMenu()
             }}
             icon={icon}
             title={text}
-            key={loc}
+            key={item}
           />
         )
       })}
@@ -67,9 +83,10 @@ const styles = StyleSheet.create({
   button: {
     marginVertical: 4,
   },
+  buttonContent: {},
   divider: {
     height: 4,
   },
 })
 
-export default memo(LocMenu)
+export default memo(ItemMenu)

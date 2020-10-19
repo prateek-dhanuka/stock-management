@@ -10,8 +10,10 @@ import {
 
 import Background from '../components/Background'
 import DialogInput from '../components/DialogInput'
+import GradeMenu from '../components/GradeMenu'
 import Header from '../components/Header'
 import { Picker } from '@react-native-community/picker'
+import ShapeMenu from '../components/ShapeMenu'
 import { getSummary } from '../core/database'
 import { getSummaryHeader } from '../core/utils'
 
@@ -20,6 +22,12 @@ const SummaryScreen = ({ route, navigation }) => {
   const [dialogVisible, setDialogVisible] = useState(false)
   const showDialog = () => setDialogVisible(true)
   const hideDialog = () => setDialogVisible(false)
+
+  // Selected Grade and Shape
+  const [selectedGrade, SelectGrade] = useState(null)
+  const [selectedShape, SelectShape] = useState(null)
+  const [selectedLoc, SelectLoc] = useState(null)
+  const [selectedOrigin, SelectOrigin] = useState(null)
 
   //Filter Data state
   const [grade, setGrade] = useState(null)
@@ -39,7 +47,11 @@ const SummaryScreen = ({ route, navigation }) => {
     ),
   })
 
-  // Navigate to camera screens
+  // Navigate to item screens
+  const detailItem = () => {
+    navigation.navigate('Item', { type: 'detail' })
+  }
+
   const addItem = () => {
     navigation.navigate('Item', { type: 'add' })
   }
@@ -71,40 +83,8 @@ const SummaryScreen = ({ route, navigation }) => {
           <Dialog.Title>Filter Summary</Dialog.Title>
           <Dialog.Content>
             <View>
-              <View style={{ flexDirection: 'column' }}>
-                <Text>Grade: </Text>
-                <Picker
-                  selectedValue={grade}
-                  onValueChange={(itemValue, itemIndex) => {
-                    setGrade(itemValue)
-                  }}>
-                  <Picker.Item label="Please select a Grade..." value={null} />
-                  {grades.map((grade) => (
-                    <Picker.Item
-                      label={grade_display[grade]}
-                      value={grade}
-                      key={grade}
-                    />
-                  ))}
-                </Picker>
-              </View>
-              <View style={{ flexDirection: 'column' }}>
-                <Text>Shape: </Text>
-                <Picker
-                  selectedValue={shape}
-                  onValueChange={(itemValue, itemIndex) => {
-                    setShape(itemValue)
-                  }}>
-                  <Picker.Item label="Please select a Shape..." value={null} />
-                  {shapes.map((shape) => (
-                    <Picker.Item
-                      label={shape_display[shape]}
-                      value={shape}
-                      key={shape}
-                    />
-                  ))}
-                </Picker>
-              </View>
+              <GradeMenu selected={selectedGrade} Select={SelectGrade} />
+              <ShapeMenu selected={selectedShape} Select={SelectShape} />
               <DialogInput
                 label="Diameter"
                 value={dia}
@@ -113,6 +93,8 @@ const SummaryScreen = ({ route, navigation }) => {
                 textContentType="none"
                 keyboardType="decimal-pad"
               />
+              <LocMenu selected={selectedLoc} Select={SelectLoc} />
+              <OriginMenu selected={selectedOrigin} Select={SelectOrigin} />
             </View>
           </Dialog.Content>
           <Dialog.Actions>
@@ -134,6 +116,14 @@ const SummaryScreen = ({ route, navigation }) => {
           The estimated cost is ₹{summary.cost}
         </Text>
         <View style={styles.divider} />
+        <Button
+          style={styles.button}
+          mode="contained"
+          color="blue"
+          contentStyle={{ height: 50 }}
+          onPress={detailItem}>
+          Detail Item
+        </Button>
         <Button
           style={styles.button}
           mode="contained"

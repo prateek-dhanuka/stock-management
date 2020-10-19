@@ -1,4 +1,4 @@
-import { shape_display, grade_display } from '../assets/constants'
+import { grade_display, shape_display } from '../assets/constants'
 
 export const emailValidator = (email) => {
   const re = /\S+@\S+\.\S+/
@@ -41,6 +41,8 @@ export const getSummaryHeader = (params) => {
 
 export const getItemScreenColor = (type) => {
   switch (type) {
+    case 'detail':
+      return 'blue'
     case 'add':
       return 'green'
     case 'remove':
@@ -52,6 +54,8 @@ export const getItemScreenColor = (type) => {
 
 export const getItemHeader = (type) => {
   switch (type) {
+    case 'detail':
+      return 'Detail Item'
     case 'add':
       return 'Add Item'
     case 'remove':

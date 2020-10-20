@@ -1,10 +1,12 @@
 import { Button, Dialog, IconButton, Portal } from 'react-native-paper'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { getItemHeader, getItemScreenColor } from '../core/utils'
 
 import Background from '../components/Background'
-import DiaInput from '../components/DiaInput'
 import ItemMenu from '../components/ItemMenu'
+import NumericInput from '../components/NumericInput'
+import database from '@react-native-firebase/database'
 import { getSummary } from '../core/database'
 import { getSummaryHeader } from '../core/utils'
 
@@ -17,16 +19,41 @@ const SummaryScreen = ({ route, navigation }) => {
   // Selected Grade and Shape
   const [selectedGrade, SelectGrade] = useState(null)
   const [selectedShape, SelectShape] = useState(null)
+  const [dia, setDia] = useState(null)
   const [selectedLoc, SelectLoc] = useState(null)
   const [selectedOrigin, SelectOrigin] = useState(null)
 
-  //Filter Data state
-  const [grade, setGrade] = useState(null)
-  const [shape, setShape] = useState(null)
-  const [dia, setDia] = useState(null)
+  // Valid states
+  const [validGrades, setValidGrades] = useState(null)
+  const [validShapes, setValidShapes] = useState(null)
+
+  // Get the valid states once
+  useEffect(() => {
+    database()
+      .ref(`/valid/grades`)
+      .once('value')
+      .then((snapshot) => {
+        setValidGrades(snapshot.val())
+      })
+
+    database()
+      .ref(`/valid/shapes`)
+      .once('value')
+      .then((snapshot) => {
+        setValidShapes(snapshot.val())
+      })
+  }, [])
 
   // Header Text
-  const header_text = getSummaryHeader(route.params)
+  var header_text
+  if (validGrades !== null && validShapes !== null) {
+    header_text = getSummaryHeader(route.params, {
+      grades: validGrades,
+      shapes: validShapes,
+    })
+  } else {
+    header_text = 'Loading'
+  }
 
   //Set Navbar
   navigation.setOptions({
@@ -36,7 +63,17 @@ const SummaryScreen = ({ route, navigation }) => {
         <IconButton icon="filter-variant" size={20} onPress={showDialog} />
       </View>
     ),
+    grade: !validGrades ? null : validGrades[route.params.grade],
+    shape: !validShapes ? null : validShapes[route.params.shape],
+    dia: route.params.dia,
   })
+  // console.log(validGrades, ': ', !!validGrades)
+  console.log(
+    `grade =`,
+    !validGrades ? null : validGrades[route.params.grade],
+    `shape = `,
+    !validShapes ? null : validShapes[route.params.shape]
+  )
 
   // Navigate to item screens
   const detailItem = () => {
@@ -54,7 +91,11 @@ const SummaryScreen = ({ route, navigation }) => {
   //Filter Functions
   const filter = () => {
     hideDialog()
-    navigation.navigate('Summary', { grade: grade, shape: shape, dia: dia })
+    navigation.navigate('Summary', {
+      grade: selectedGrade,
+      shape: selectedShape,
+      dia: dia,
+    })
   }
 
   const clearFilters = () => {
@@ -65,7 +106,7 @@ const SummaryScreen = ({ route, navigation }) => {
     navigation.navigate('Summary', { grade: null, shape: null, dia: null })
   }
 
-  const summary = getSummary(grade, shape, dia)
+  const summary = getSummary(selectedGrade, selectedShape, dia)
 
   return (
     <Background>
@@ -84,7 +125,7 @@ const SummaryScreen = ({ route, navigation }) => {
                 selected={selectedShape}
                 Select={SelectShape}
               />
-              <DiaInput selected={dia} Select={setDia} />
+              <NumericInput label={'Diameter'} selected={dia} Select={setDia} />
               <ItemMenu item="loc" selected={selectedLoc} Select={SelectLoc} />
               <ItemMenu
                 item="origin"
@@ -101,55 +142,50 @@ const SummaryScreen = ({ route, navigation }) => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      <View style={styles.container}>
-        <Text style={styles.summaryText}>
-          There are {summary.count} rods in stock
-        </Text>
-        <Text style={styles.summaryText}>
-          The combined weight is {summary.weight}Kg
-        </Text>
-        <Text style={styles.summaryText}>
-          The estimated cost is ₹{summary.cost}
-        </Text>
-        <View style={styles.divider} />
-        <Button
-          style={styles.button}
-          mode="contained"
-          color="blue"
-          contentStyle={{ height: 50 }}
-          onPress={detailItem}>
-          Detail Item
-        </Button>
-        <Button
-          style={styles.button}
-          mode="contained"
-          color="green"
-          contentStyle={{ height: 50 }}
-          onPress={addItem}>
-          Add Item
-        </Button>
-        <Button
-          style={styles.button}
-          mode="contained"
-          color="red"
-          contentStyle={{ height: 50 }}
-          onPress={removeItem}>
-          Remove Item
-        </Button>
-      </View>
+      <>
+        <View style={styles.topContainer}>
+          <Text style={styles.summaryText}>
+            There are {summary.count} rods in stock
+          </Text>
+          <Text style={styles.summaryText}>
+            The combined weight is {summary.weight}Kg
+          </Text>
+          <Text style={styles.summaryText}>
+            The estimated cost is ₹{summary.cost}
+          </Text>
+        </View>
+        <View style={styles.bottomContainer}>
+          <Button
+            style={styles.button}
+            mode="contained"
+            color={getItemScreenColor('detail')}
+            contentStyle={{ height: 50 }}
+            onPress={detailItem}>
+            Detail Item
+          </Button>
+          <Button
+            style={styles.button}
+            mode="contained"
+            color={getItemScreenColor('add')}
+            contentStyle={{ height: 50 }}
+            onPress={addItem}>
+            Add Item
+          </Button>
+          <Button
+            style={styles.button}
+            mode="contained"
+            color={getItemScreenColor('remove')}
+            contentStyle={{ height: 50 }}
+            onPress={removeItem}>
+            Remove Item
+          </Button>
+        </View>
+      </>
     </Background>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    // alignItems: 'center',
-  },
-  divider: {
-    flex: 1,
-  },
   summaryText: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -158,6 +194,21 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 12,
+  },
+  topContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+  },
+  bottomContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+  },
+  centerContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
 })
 

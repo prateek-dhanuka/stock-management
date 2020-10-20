@@ -6,29 +6,29 @@ const Background = ({ children }) => (
     source={require('../assets/background_dot.png')}
     resizeMode="repeat"
     style={styles.background}>
-    <View style={styles.container} behavior="padding">
-      {children}
-    </View>
+    <View style={styles.container}>{children}</View>
   </ImageBackground>
 )
 
 const styles = StyleSheet.create({
   background: {
     position: 'absolute',
-    flex: 1,
+    // flex: 1,
     top: 0,
     bottom: 0,
     left: 0,
     right: 0,
   },
   container: {
-    flex: 1,
+    // flex: 1,
+    flexDirection: 'column',
     padding: 20,
+    height: '100%',
     width: '100%',
     // maxWidth: 340,
     alignSelf: 'center',
     // alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
   },
 })
 

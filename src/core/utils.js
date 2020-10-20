@@ -19,18 +19,18 @@ export const nameValidator = (name) => {
   return ''
 }
 
-export const getSummaryHeader = (params) => {
+export const getSummaryHeader = (params, valid) => {
   var header_text = 'Summary'
   if (params.grade !== null || params.shape !== null || params.dia !== null) {
     header_text = ''
     if (params.shape != null) {
-      header_text += `${shape_display[params.shape]}`
+      header_text += `${valid.shapes[params.shape].icon}`
     }
     if (params.dia != null) {
       header_text += `${params.dia} `
     }
     if (params.grade != null) {
-      header_text += `${grade_display[params.grade]}`
+      header_text += `${valid.grades[params.grade].icon}`
     }
     // header_text = header_text.slice(0, -1)
   }
@@ -40,11 +40,11 @@ export const getSummaryHeader = (params) => {
 export const getItemScreenColor = (type) => {
   switch (type) {
     case 'detail':
-      return 'blue'
+      return '#1f00a3'
     case 'add':
-      return 'green'
+      return '#008710'
     case 'remove':
-      return 'red'
+      return '#791b1e'
     default:
       return null
   }

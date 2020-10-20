@@ -12,10 +12,10 @@ const ItemMenu = ({ item, selected, Select, color, mode }) => {
   const openMenu = () => setVisible(true)
   const closeMenu = () => setVisible(false)
 
-  // Valid grade state
+  // Valid item state
   const [validItems, setValidItems] = useState({})
 
-  // Get Grades from database once on load
+  // Get valid items from database once on load
   useEffect(() => {
     database()
       .ref(`/valid/${item}s`)
@@ -45,8 +45,13 @@ const ItemMenu = ({ item, selected, Select, color, mode }) => {
           style={styles.button}
           contentStyle={styles.buttonContent}
           mode={mode}
-          color={color}>
-          {selected === null ? `Select a ${item}` : selected}
+          color={color}
+          icon={selected === null ? null : 'check-outline'}>
+          {selected === null
+            ? item === 'loc'
+              ? 'location'
+              : `${item}`
+            : selected}
         </Button>
       }>
       <Menu.Item
@@ -60,6 +65,8 @@ const ItemMenu = ({ item, selected, Select, color, mode }) => {
       {Object.keys(validItems).map((item) => {
         const icon = validItems[item].icon
         const text = validItems[item].text
+        const color = validItems[item].color
+
         return (
           <Menu.Item
             onPress={() => {
@@ -67,6 +74,7 @@ const ItemMenu = ({ item, selected, Select, color, mode }) => {
               closeMenu()
             }}
             icon={icon}
+            iconcolor={color}
             title={text}
             key={item}
           />

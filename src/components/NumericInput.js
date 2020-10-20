@@ -4,15 +4,22 @@ import { StyleSheet, Text, View } from 'react-native'
 import { TextInput } from 'react-native-paper'
 import { theme } from '../core/theme'
 
-const DiaInput = ({ selected, Select }) => (
+const NumericInput = ({ label, selected, Select, color }) => (
   <View style={styles.container}>
     <TextInput
       style={styles.input}
-      selectionColor={theme.colors.primary}
-      underlineColor={theme.colors.primary}
+      selectionColor={color ? color : theme.colors.primary}
+      theme={
+        color
+          ? {
+              ...theme,
+              colors: { placeholder: color, text: color, primary: color },
+            }
+          : theme
+      }
       mode="outlined"
       dense
-      label="Diameter"
+      label={label}
       value={selected}
       onChangeText={(text) => Select(text)}
       autoCapitalize="none"
@@ -31,4 +38,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default memo(DiaInput)
+export default memo(NumericInput)

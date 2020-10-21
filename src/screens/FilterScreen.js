@@ -12,29 +12,31 @@ import { useState } from 'react'
 
 const FilterScreen = ({ route, navigation }) => {
   //Data state
-  const [selectedGrade, SelectGrade] = useState(null)
-  const [selectedShape, SelectShape] = useState(null)
-  const [selectedDia, SelectDia] = useState(null)
-  const [selectedLoc, SelectLoc] = useState(null)
-  const [selectedCost, SelectCost] = useState(null)
-  const [selectedCount, SelectCount] = useState(null)
-  const [selectedLength, SelectLength] = useState(null)
-  const [selectedOrigin, SelectOrigin] = useState(null)
-  const [selectedColor, SelectColor] = useState(null)
-  const [selectedIsFull, SelectIsFull] = useState(true)
+  const [selectedGrade, SelectGrade] = React.useState(null)
+  const [selectedShape, SelectShape] = React.useState(null)
+  const [selectedDia, SelectDia] = React.useState(null)
+  const [selectedLoc, SelectLoc] = React.useState(null)
+  const [selectedCost, SelectCost] = React.useState(null)
+  const [selectedCount, SelectCount] = React.useState(null)
+  const [selectedLength, SelectLength] = React.useState(null)
+  const [selectedOrigin, SelectOrigin] = React.useState(null)
+  const [selectedColor, SelectColor] = React.useState(null)
+  const [selectedIsFull, SelectIsFull] = React.useState(true)
 
   //Get Navbar data
   var color = getItemScreenColor(route.params.type)
   var header_text = getItemHeader(route.params.type)
 
   // Set Navbar
-  navigation.setOptions({
-    headerStyle: {
-      backgroundColor: color,
-    },
-    title: header_text,
-    headerTintColor: 'lightyellow',
-  })
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: color,
+      },
+      title: header_text,
+      headerTintColor: 'lightyellow',
+    })
+  }, [])
 
   // Submit function
   const handleSubmit = () => {
@@ -143,7 +145,6 @@ const FilterScreen = ({ route, navigation }) => {
                   Is Full Length
                 </Text>
               }
-              theme={theme}
               right={(props) => (
                 <Switch
                   {...props}

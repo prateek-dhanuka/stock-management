@@ -1,30 +1,20 @@
 import { Divider, Menu } from 'react-native-paper'
-import React, { memo, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import Button from './Button'
-import database from '@react-native-firebase/database'
+import React from 'react'
+import ValidContext from '../core/ValidContext'
 import { theme } from '../core/theme'
 
 const ItemMenu = ({ item, selected, Select, color, mode }) => {
   // Visibility state
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = React.useState(false)
   const openMenu = () => setVisible(true)
   const closeMenu = () => setVisible(false)
 
   // Valid item state
-  const [validItems, setValidItems] = useState({})
-
-  // Get valid items from database once on load
-  useEffect(() => {
-    database()
-      .ref(`/valid/${item}s`)
-      .once('value')
-      .then((snapshot) => {
-        // console.log('Valid grades are ', snapshot.val())
-        setValidItems(snapshot.val())
-      })
-  }, [])
+  const valid = React.useContext(ValidContext)
+  const validItems = valid[item + 's']
 
   //Decode parameters
   if (color === undefined) {
@@ -97,4 +87,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default memo(ItemMenu)
+export default React.memo(ItemMenu)

@@ -14,7 +14,9 @@ const LoginScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false)
 
   // Set Options here
-  navigation.setOptions({ title: 'Home screen', headerShown: false })
+  useEffect(() => {
+    navigation.setOptions({ title: 'Home screen', headerShown: false })
+  }, [])
 
   //Login pressed handler
   const onLoginPressed = async () => {

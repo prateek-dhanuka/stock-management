@@ -11,11 +11,8 @@ const NumericInput = ({ label, selected, Select, color }) => (
       selectionColor={color ? color : theme.colors.primary}
       theme={
         color
-          ? {
-              ...theme,
-              colors: { placeholder: color, text: color, primary: color },
-            }
-          : theme
+          ? { colors: { placeholder: color, text: color, primary: color } }
+          : {}
       }
       mode="outlined"
       dense

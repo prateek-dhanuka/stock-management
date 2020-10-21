@@ -1,79 +1,46 @@
 import { Button, Dialog, IconButton, Portal } from 'react-native-paper'
-import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { getItemHeader, getItemScreenColor } from '../core/utils'
 
 import Background from '../components/Background'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import ItemMenu from '../components/ItemMenu'
 import NumericInput from '../components/NumericInput'
-import database from '@react-native-firebase/database'
+import React from 'react'
+import ValidContext from '../core/ValidContext'
 import { getSummary } from '../core/database'
 import { getSummaryHeader } from '../core/utils'
 
 const SummaryScreen = ({ route, navigation }) => {
   // Summary filter dialog state
-  const [dialogVisible, setDialogVisible] = useState(false)
+  const [dialogVisible, setDialogVisible] = React.useState(false)
   const showDialog = () => setDialogVisible(true)
   const hideDialog = () => setDialogVisible(false)
 
   // Selected Grade and Shape
-  const [selectedGrade, SelectGrade] = useState(null)
-  const [selectedShape, SelectShape] = useState(null)
-  const [dia, setDia] = useState(null)
-  const [selectedLoc, SelectLoc] = useState(null)
-  const [selectedOrigin, SelectOrigin] = useState(null)
+  const [selectedGrade, SelectGrade] = React.useState(null)
+  const [selectedShape, SelectShape] = React.useState(null)
+  const [dia, setDia] = React.useState(null)
+  const [selectedLoc, SelectLoc] = React.useState(null)
+  const [selectedOrigin, SelectOrigin] = React.useState(null)
 
   // Valid states
-  const [validGrades, setValidGrades] = useState(null)
-  const [validShapes, setValidShapes] = useState(null)
-
-  // Get the valid states once
-  useEffect(() => {
-    database()
-      .ref(`/valid/grades`)
-      .once('value')
-      .then((snapshot) => {
-        setValidGrades(snapshot.val())
-      })
-
-    database()
-      .ref(`/valid/shapes`)
-      .once('value')
-      .then((snapshot) => {
-        setValidShapes(snapshot.val())
-      })
-  }, [])
+  const valid = React.useContext(ValidContext)
 
   // Header Text
-  var header_text
-  if (validGrades !== null && validShapes !== null) {
-    header_text = getSummaryHeader(route.params, {
-      grades: validGrades,
-      shapes: validShapes,
-    })
-  } else {
-    header_text = 'Loading'
-  }
+  const header_text = getSummaryHeader(route.params, valid)
 
   //Set Navbar
-  navigation.setOptions({
-    title: header_text,
-    headerRight: () => (
-      <View style={{ flexDirection: 'row' }}>
-        <IconButton icon="filter-variant" size={20} onPress={showDialog} />
-      </View>
-    ),
-    grade: !validGrades ? null : validGrades[route.params.grade],
-    shape: !validShapes ? null : validShapes[route.params.shape],
-    dia: route.params.dia,
-  })
-  // console.log(validGrades, ': ', !!validGrades)
-  console.log(
-    `grade =`,
-    !validGrades ? null : validGrades[route.params.grade],
-    `shape = `,
-    !validShapes ? null : validShapes[route.params.shape]
-  )
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      title: header_text,
+      headerRight: () => (
+        <View style={{ flexDirection: 'row' }}>
+          <IconButton icon="filter-variant" size={20} onPress={showDialog} />
+        </View>
+      ),
+    })
+  }, [valid, route.params])
 
   // Navigate to item screens
   const detailItem = () => {
@@ -91,7 +58,7 @@ const SummaryScreen = ({ route, navigation }) => {
   //Filter Functions
   const filter = () => {
     hideDialog()
-    navigation.navigate('Summary', {
+    navigation.setParams({
       grade: selectedGrade,
       shape: selectedShape,
       dia: dia,
@@ -99,11 +66,11 @@ const SummaryScreen = ({ route, navigation }) => {
   }
 
   const clearFilters = () => {
-    setGrade(null)
+    SelectGrade(null)
     setDia(null)
-    setShape(null)
+    SelectShape(null)
     hideDialog()
-    navigation.navigate('Summary', { grade: null, shape: null, dia: null })
+    navigation.setParams({ grade: null, shape: null, dia: null })
   }
 
   const summary = getSummary(selectedGrade, selectedShape, dia)

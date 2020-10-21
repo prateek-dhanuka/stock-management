@@ -15,7 +15,6 @@ const Main = () => {
       .once('value')
       .then((snapshot) => {
         setValid(snapshot.val())
-        console.log('Got Valid = ', snapshot.val())
       })
   }, [])
 

@@ -24,6 +24,13 @@ const SummaryScreen = ({ route, navigation }) => {
   const [selectedLoc, SelectLoc] = React.useState(null)
   const [selectedOrigin, SelectOrigin] = React.useState(null)
 
+  // Summary
+  const [summary, setSummary] = React.useState({})
+
+  React.useEffect(() => {
+    setSummary(getSummary(selectedGrade, selectedShape, dia))
+  }, [selectedGrade, selectedShape, dia])
+
   // Valid states
   const valid = React.useContext(ValidContext)
 
@@ -72,8 +79,6 @@ const SummaryScreen = ({ route, navigation }) => {
     hideDialog()
     navigation.setParams({ grade: null, shape: null, dia: null })
   }
-
-  const summary = getSummary(selectedGrade, selectedShape, dia)
 
   return (
     <Background>

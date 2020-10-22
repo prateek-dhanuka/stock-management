@@ -23,14 +23,14 @@ export const getSummaryHeader = (params, valid) => {
   var header_text = 'Summary'
   if (params.grade !== null || params.shape !== null || params.dia !== null) {
     header_text = ''
-    if (params.shape != null) {
-      header_text += `${valid.shapes[params.shape].icon}`
-    }
     if (params.dia != null) {
       header_text += `${params.dia} `
     }
     if (params.grade != null) {
-      header_text += `${valid.grades[params.grade].icon}`
+      header_text += `${valid.grades[params.grade].text} `
+    }
+    if (params.shape != null) {
+      header_text += `${valid.shapes[params.shape].text}`
     }
     // header_text = header_text.slice(0, -1)
   }

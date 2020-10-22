@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { StyleSheet, View } from 'react-native'
 import { emailValidator, passwordValidator } from '../core/utils'
 
 import Background from '../components/Background'
@@ -71,35 +72,59 @@ const LoginScreen = ({ route, navigation }) => {
 
   return (
     <Background>
-      <Header>Stock Management</Header>
-      <TextInput
-        label="Email"
-        returnKeyType="next"
-        value={email.value}
-        onChangeText={(text) => setEmail({ value: text, error: '' })}
-        error={!!email.error}
-        errorText={email.error}
-        autoCapitalize="none"
-        autoCompleteType="email"
-        textContentType="emailAddress"
-        keyboardType="email-address"
-      />
-      <TextInput
-        label="Password"
-        returnKeyType="done"
-        value={password.type}
-        onChangeText={(text) => setPassword({ value: text, error: '' })}
-        error={!!password.error}
-        errorText={password.error}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-
-      <Button loading={loading} mode="contained" onPress={onLoginPressed}>
-        Login
-      </Button>
+      <View style={styles.topContainer}>
+        <Header>Stock Management</Header>
+      </View>
+      <View style={styles.centerContainer}>
+        <TextInput
+          label="Email"
+          returnKeyType="next"
+          value={email.value}
+          onChangeText={(text) => setEmail({ value: text, error: '' })}
+          error={!!email.error}
+          errorText={email.error}
+          autoCapitalize="none"
+          autoCompleteType="email"
+          textContentType="emailAddress"
+          keyboardType="email-address"
+        />
+        <TextInput
+          label="Password"
+          returnKeyType="done"
+          value={password.type}
+          onChangeText={(text) => setPassword({ value: text, error: '' })}
+          error={!!password.error}
+          errorText={password.error}
+          secureTextEntry
+          autoCapitalize="none"
+        />
+      </View>
+      <View style={styles.bottomContainer}>
+        <Button loading={loading} mode="contained" onPress={onLoginPressed}>
+          Login
+        </Button>
+      </View>
     </Background>
   )
 }
+
+const styles = StyleSheet.create({
+  topContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    alignContent: 'center',
+    justifyContent: 'flex-start',
+  },
+  bottomContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+  },
+  centerContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+})
 
 export default LoginScreen

@@ -1,8 +1,10 @@
 {
   "rules": {
-    ".read": "auth != null",
-    ".write": "auth != null",
+    ".read": "true",
+    ".write": "true",
     "summary": {
+      ".read": "true",
+      ".write": "true",
       // Make sure that summary always has count, weight and cost
       ".validate": "newData.hasChildren(['count', 'weight', 'cost'])",
       "count": {
@@ -19,6 +21,8 @@
       }
     },
     "data": {
+      ".read": "true",
+      ".write": "true",
       "$node_id": {
         // Making sure data has all necessary data
         ".validate": "newData.hasChildren(['grade', 'shape', 'dia', 'loc', 'count', 'length', 'origin', 'color'])",

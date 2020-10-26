@@ -1,4 +1,9 @@
-import { ImageBackground, StyleSheet, View } from 'react-native'
+import {
+  ImageBackground,
+  KeyboardAvoidingView,
+  StyleSheet,
+  View,
+} from 'react-native'
 import React, { memo } from 'react'
 
 const Background = ({ children }) => (
@@ -6,7 +11,9 @@ const Background = ({ children }) => (
     source={require('../assets/background_dot.png')}
     resizeMode="repeat"
     style={styles.background}>
-    <View style={styles.container}>{children}</View>
+    <KeyboardAvoidingView style={styles.container} behavior="height">
+      {children}
+    </KeyboardAvoidingView>
   </ImageBackground>
 )
 

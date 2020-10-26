@@ -1,4 +1,3 @@
-import React from 'react'
 import ValidContext from './ValidContext'
 import database from '@react-native-firebase/database'
 import { getItemScreenColor } from './utils'
@@ -20,25 +19,33 @@ export function getSummary(grade, shape, dia) {
   }
 }
 
+export function addItems(data) {
+  console.log(`Trying to push Data: `, data)
+  database()
+    .ref('/data/')
+    .push(data)
+    .then((x) => console.log('Returned ', x))
+}
+
 export function getCounts(grade, shape, dia, valid) {
   const origins = valid.origins
   const locs = valid.locs
 
   const output = { full: {}, partial: {} }
   Object.keys(origins).forEach((origin) => {
-    output["full"][origin] = {}
-    output["partial"][origin] = {}
+    output['full'][origin] = {}
+    output['partial'][origin] = {}
     Object.keys(locs).forEach((loc) => {
       const full = Math.floor(10 * Math.random())
       const partial = Math.floor(10 * Math.random())
       for (let i = 0; i < partial; ++i) {
-        output["partial"][origin][loc] = {
+        output['partial'][origin][loc] = {
           length: Math.floor(6000 * Math.random()),
           count: Math.floor(10 * Math.random()),
         }
       }
 
-      output["full"][origin][loc] = full
+      output['full'][origin][loc] = full
     })
   })
 

@@ -22,7 +22,7 @@ const DataCell = (props) => {
         numberOfLines={1}
         style={[
           important ? styles.importantText : styles.textStyle,
-          color ? { color: color } : null,
+          color ? { color } : null,
           textStyle,
         ]}>
         {children}

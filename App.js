@@ -9,7 +9,7 @@ const Main = () => {
   // Entire valid part from Database
   const [valid, setValid] = React.useState({})
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     database()
       .ref('/valid/')
       .once('value')

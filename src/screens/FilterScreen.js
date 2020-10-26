@@ -7,6 +7,7 @@ import Button from '../components/Button'
 import ItemMenu from '../components/ItemMenu'
 import NumericInput from '../components/NumericInput'
 import React from 'react'
+import { addItems } from '../core/database'
 import { theme } from '../core/theme'
 import { useState } from 'react'
 
@@ -60,25 +61,53 @@ const FilterScreen = ({ route, navigation }) => {
       }
     }
 
+    // Add/Remove form verification
+    if (route.params.type === 'add' || route.params.type === 'remove') {
+      if (selectedGrade === null) {
+        ToastAndroid.show('Please select a Grade!', ToastAndroid.SHORT)
+        return
+      }
+      if (selectedShape === null) {
+        ToastAndroid.show('Please select a Shape!', ToastAndroid.SHORT)
+        return
+      }
+      if (selectedLoc === null) {
+        ToastAndroid.show('Please Enter a Location', ToastAndroid.SHORT)
+        return
+      }
+      if (selectedOrigin === null) {
+        ToastAndroid.show('Please Enter a Origin', ToastAndroid.SHORT)
+        return
+      }
+      if (selectedDia === null) {
+        ToastAndroid.show('Please Enter a Dia!', ToastAndroid.SHORT)
+        return
+      }
+    }
+
     const data = {
       grade: selectedGrade,
       shape: selectedShape,
-      dia: selectedDia,
+      dia: parseInt(selectedDia),
       loc: selectedLoc,
-      cost: selectedCost,
-      length: selectedIsFull ? -1 : selectedLength,
+      cost: parseInt(selectedCost),
+      length: selectedIsFull ? -1 : parseInt(selectedLength),
       origin: selectedOrigin,
       color: selectedColor,
+      count: parseInt(selectedCount),
     }
-    console.log(`Entered the following details:`)
-    console.log(data)
+
+    if (route.params.type === 'add') {
+      addItems(data)
+    }
+
     navigation.navigate('Test', data)
   }
 
   return (
     <Background>
-      <View style={styles.topContainer} />
-      <View style={styles.centerContainer}>
+      {/* <View style={styles.topContainer} /> */}
+      <View style={styles.topContainer}>
         <ItemMenu
           item="grade"
           selected={selectedGrade}
@@ -140,8 +169,7 @@ const FilterScreen = ({ route, navigation }) => {
             />
             <List.Item
               title={
-                <Text
-                  style={{ color: color, fontWeight: 'bold', fontSize: 16 }}>
+                <Text style={{ color, fontWeight: 'bold', fontSize: 16 }}>
                   Is Full Length
                 </Text>
               }

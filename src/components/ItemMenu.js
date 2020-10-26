@@ -2,6 +2,7 @@ import { Divider, Menu } from 'react-native-paper'
 import { StyleSheet, View } from 'react-native'
 
 import Button from './Button'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React from 'react'
 import ValidContext from '../core/ValidContext'
 import { theme } from '../core/theme'
@@ -56,6 +57,7 @@ const ItemMenu = ({ item, selected, Select, color, mode }) => {
         const icon = validItems[item].icon
         const text = validItems[item].text
         const color = validItems[item].color
+        const bgColor = validItems[item].bgColor
 
         return (
           <Menu.Item
@@ -63,7 +65,19 @@ const ItemMenu = ({ item, selected, Select, color, mode }) => {
               Select(item)
               closeMenu()
             }}
-            icon={icon}
+            icon={(props) => {
+              return (
+                <>
+                  <View
+                    style={[
+                      styles.fillView,
+                      bgColor && { backgroundColor: bgColor },
+                    ]}
+                  />
+                  <Icon size={props.size} color={color} name={icon} />
+                </>
+              )
+            }}
             iconcolor={color}
             title={text}
             key={item}
@@ -84,6 +98,13 @@ const styles = StyleSheet.create({
   buttonContent: {},
   divider: {
     height: 4,
+  },
+  fillView: {
+    position: 'absolute',
+    top: 5,
+    left: 5,
+    width: 14,
+    height: 14,
   },
 })
 

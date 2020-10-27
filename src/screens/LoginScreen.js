@@ -67,7 +67,7 @@ const LoginScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
-    return subscriber
+    // return subscriber
   }, [])
 
   return (

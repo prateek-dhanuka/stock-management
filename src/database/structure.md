@@ -30,7 +30,30 @@
 	  "locs": ["loc1", "loc2", ...],
 	  "origins": ["origin1", "origin2", ...]
 	  //TODO: Add a way to add valid options
+  },
+  "filters": { // Use these to find key of advanced query
+    // Start sorting by grade
+    "grade1": {
+      // then do shape
+      "shape1": {
+        // then dia
+        "dia1": {
+          // then origin
+          "origin1": {
+            // then color
+            "color1": {
+              // cost
+              "cost1": {
+                //location
+                "location1": {
+                  "unique_key1"
+                }, ...
+              }, ...
+            }, ...
+          }, ...
+        }, ...
+      }, ...
+    },...
   }
-  //TODO: Should anything else be stored?
 }
 ```

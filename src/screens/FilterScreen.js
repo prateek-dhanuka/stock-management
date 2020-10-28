@@ -79,6 +79,9 @@ const FilterScreen = ({ route, navigation }) => {
         ToastAndroid.show('Please Enter a Origin', ToastAndroid.SHORT)
         return
       }
+      if (selectedColor === null) {
+        ToastAndroid.show('Please Enter a Color!', ToastAndroid.SHORT)
+      }
       if (selectedDia === null) {
         ToastAndroid.show('Please Enter a Dia!', ToastAndroid.SHORT)
         return
@@ -90,15 +93,18 @@ const FilterScreen = ({ route, navigation }) => {
       shape: selectedShape,
       dia: parseInt(selectedDia),
       loc: selectedLoc,
-      cost: parseInt(selectedCost),
+      cost: selectedCost ? parseInt(selectedCost) : 0,
       length: selectedIsFull ? -1 : parseInt(selectedLength),
       origin: selectedOrigin,
       color: selectedColor,
-      count: parseInt(selectedCount),
+      count: selectedCount ? parseInt(selectedCount) : 1,
     }
 
     if (route.params.type === 'add') {
+      console.log('Going to add ', data)
       addItems(data)
+        .then(() => console.log(`Added item via a transaction`))
+        .catch((error) => console.error(error))
     }
 
     navigation.navigate('Test', data)

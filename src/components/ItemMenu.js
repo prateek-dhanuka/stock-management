@@ -42,7 +42,7 @@ const ItemMenu = ({ item, selected, Select, color, mode }) => {
             ? item === 'loc'
               ? 'location'
               : `${item}`
-            : selected}
+            : validItems[selected].text}
         </Button>
       }>
       <Menu.Item

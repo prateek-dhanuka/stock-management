@@ -1,7 +1,4 @@
-import ValidContext from './ValidContext'
-import database from '@react-native-firebase/database'
 import firestore from '@react-native-firebase/firestore'
-import { getItemScreenColor } from './utils'
 
 /**
  *

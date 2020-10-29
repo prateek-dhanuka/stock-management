@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React from 'react'
 import ValidContext from '../core/ValidContext'
 
-const TestScreen = ({ route, navigation }) => {
+const DetailScreen = ({ route, navigation }) => {
   // Received params
   const { grade, shape, dia } = route.params
 
@@ -129,4 +129,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default TestScreen
+export default DetailScreen

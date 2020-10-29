@@ -17,7 +17,7 @@ const Main = () => {
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
-            console.log(doc.id, '=>', doc.data())
+            // console.log(doc.id, '=>', doc.data())
             data[doc.id] = doc.data()
           })
           setValid(data)

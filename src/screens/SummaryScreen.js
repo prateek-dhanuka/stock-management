@@ -18,18 +18,22 @@ const SummaryScreen = ({ route, navigation }) => {
   const hideDialog = () => setDialogVisible(false)
 
   // Selected Grade and Shape
-  const [selectedGrade, SelectGrade] = React.useState(null)
-  const [selectedShape, SelectShape] = React.useState(null)
-  const [dia, setDia] = React.useState(null)
-  const [selectedLoc, SelectLoc] = React.useState(null)
-  const [selectedOrigin, SelectOrigin] = React.useState(null)
+  const [grade, SelectGrade] = React.useState(null)
+  const [shape, SelectShape] = React.useState(null)
+  const [dia, SelectDia] = React.useState(null)
+  const [loc, SelectLoc] = React.useState(null)
+  const [origin, SelectOrigin] = React.useState(null)
 
   // Summary
   const [summary, setSummary] = React.useState({})
 
   React.useEffect(() => {
-    setSummary(getSummary(selectedGrade, selectedShape, dia))
-  }, [selectedGrade, selectedShape, dia])
+    async function summaryFunc() {
+      const summaryData = await getSummary({ grade, shape, dia, loc, origin })
+      setSummary(summaryData)
+    }
+    summaryFunc()
+  }, [grade, shape, dia, loc, origin])
 
   // Valid states
   const valid = React.useContext(ValidContext)
@@ -66,15 +70,15 @@ const SummaryScreen = ({ route, navigation }) => {
   const filter = () => {
     hideDialog()
     navigation.setParams({
-      grade: selectedGrade,
-      shape: selectedShape,
+      grade: grade,
+      shape: shape,
       dia: dia,
     })
   }
 
   const clearFilters = () => {
     SelectGrade(null)
-    setDia(null)
+    SelectDia(null)
     SelectShape(null)
     hideDialog()
     navigation.setParams({ grade: null, shape: null, dia: null })
@@ -87,23 +91,15 @@ const SummaryScreen = ({ route, navigation }) => {
           <Dialog.Title>Filter Summary</Dialog.Title>
           <Dialog.Content>
             <View>
-              <ItemMenu
-                item="grade"
-                selected={selectedGrade}
-                Select={SelectGrade}
+              <ItemMenu item="grade" selected={grade} Select={SelectGrade} />
+              <ItemMenu item="shape" selected={shape} Select={SelectShape} />
+              <NumericInput
+                label={'Diameter'}
+                selected={dia}
+                Select={SelectDia}
               />
-              <ItemMenu
-                item="shape"
-                selected={selectedShape}
-                Select={SelectShape}
-              />
-              <NumericInput label={'Diameter'} selected={dia} Select={setDia} />
-              <ItemMenu item="loc" selected={selectedLoc} Select={SelectLoc} />
-              <ItemMenu
-                item="origin"
-                selected={selectedOrigin}
-                Select={SelectOrigin}
-              />
+              <ItemMenu item="loc" selected={loc} Select={SelectLoc} />
+              <ItemMenu item="origin" selected={origin} Select={SelectOrigin} />
             </View>
           </Dialog.Content>
           <Dialog.Actions>

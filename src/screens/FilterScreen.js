@@ -1,5 +1,6 @@
-import { List, Switch, Text } from 'react-native-paper'
+import { Dialog, List, Portal, Switch, Text } from 'react-native-paper'
 import { StyleSheet, ToastAndroid, View } from 'react-native'
+import { addItems, findIdToRemove, removeItems } from '../core/database'
 import { getItemHeader, getItemScreenColor } from '../core/utils'
 
 import Background from '../components/Background'
@@ -7,9 +8,7 @@ import Button from '../components/Button'
 import ItemMenu from '../components/ItemMenu'
 import NumericInput from '../components/NumericInput'
 import React from 'react'
-import { addItems } from '../core/database'
 import { theme } from '../core/theme'
-import { useState } from 'react'
 
 const FilterScreen = ({ route, navigation }) => {
   //Data state
@@ -24,6 +23,11 @@ const FilterScreen = ({ route, navigation }) => {
   const [selectedColor, SelectColor] = React.useState(null)
   const [selectedIsFull, SelectIsFull] = React.useState(true)
 
+  // Remove item Multiple items dialog
+  const [dialogVisible, setDialogVisible] = React.useState(false)
+  const showDialog = () => setDialogVisible(true)
+  const hideDialog = () => setDialogVisible(false)
+
   //Get Navbar data
   var color = getItemScreenColor(route.params.type)
   var header_text = getItemHeader(route.params.type)
@@ -35,14 +39,12 @@ const FilterScreen = ({ route, navigation }) => {
         backgroundColor: color,
       },
       title: header_text,
-      headerTintColor: 'lightyellow',
+      headerTintColor: 'white',
     })
   }, [])
 
   // Submit function
   const handleSubmit = () => {
-    //TODO: Add form verification
-    //TODO: Add database integration
     //TODO: Add length decoding capability
 
     // Detail form verification
@@ -105,14 +107,36 @@ const FilterScreen = ({ route, navigation }) => {
       addItems(data)
         .then(() => console.log(`Added item via a transaction`))
         .catch((error) => console.error(error))
+      navigation.navigate('Detail', data)
     }
 
-    navigation.navigate('Test', data)
+    if (route.params.type === 'remove') {
+      console.log('Going to remove', data)
+      findIdToRemove(data)
+        .then((ids) => {
+          console.log(`Found the following ids: `, ids)
+          if (Array.isArray(ids)) {
+            setDialogVisible(true)
+            return
+          }
+        })
+        .catch((error) => console.error(error))
+    }
+
+    if (route.params.type === 'detail') {
+      navigation.navigate('Detail', data)
+    }
   }
 
   return (
     <Background>
-      {/* <View style={styles.topContainer} /> */}
+      <Portal>
+        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+          <Dialog.Title>
+            Found Multiple Items that match the Filter
+          </Dialog.Title>
+        </Dialog>
+      </Portal>
       <View style={styles.topContainer}>
         <ItemMenu
           item="grade"

@@ -62,3 +62,11 @@ export const getItemHeader = (type) => {
       return 'Item'
   }
 }
+
+export const clean = ({ cost, count, weight }) => {
+  return {
+    cost: Math.round(cost),
+    count: Math.round(count),
+    weight: Math.round(weight),
+  }
+}

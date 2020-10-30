@@ -116,10 +116,23 @@ const SummaryScreen = ({ route, navigation }) => {
             There are {summary.count} rods in stock
           </Text>
           <Text style={styles.summaryText}>
-            The combined weight is {summary.weight}Kg
+            The combined weight is{' '}
+            {summary.weight === undefined
+              ? 0
+              : summary.weight.toLocaleString('en-IN')}
+            Kg
           </Text>
           <Text style={styles.summaryText}>
-            The estimated cost is ₹{summary.cost}
+            The estimated cost is{' '}
+            {summary.cost === undefined
+              ? 0
+              : summary.cost.toLocaleString('en-IN', {
+                  style: 'currency',
+                  currency: 'INR',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                  // maximumFractionDigits: 1,
+                })}
           </Text>
         </View>
         <View style={styles.bottomContainer}>

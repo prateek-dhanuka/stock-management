@@ -114,7 +114,7 @@ const FilterScreen = ({ route, navigation }) => {
       console.log('Going to remove', data)
       findIdToRemove(data)
         .then((ids) => {
-          console.log(`Found the following ids: `, ids)
+          console.log(`Found the following ids(${ids.length}): `, ids)
           if (Array.isArray(ids)) {
             setDialogVisible(true)
             return

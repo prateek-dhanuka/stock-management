@@ -105,74 +105,55 @@ export async function addItems(data) {
     (data.shape === 'round' ? 162000 : 127000)
   const cost = weight * data.cost
 
-  return firestore().runTransaction(async (transaction) => {
-    // If data already exists, get it
-    const dataSnap = dataRef === null ? null : await transaction.get(dataRef)
-    if (dataSnap !== null && !dataSnap.exists) {
-      throw 'Data exists but is empty!'
-    }
+  const batch = firestore().batch()
 
-    // Increment overall Summary
-    transaction.update(summaryRef, {
+  // Increment overall summary
+  batch.update(summaryRef, {
+    count: firestore.FieldValue.increment(data.count),
+    cost: firestore.FieldValue.increment(cost),
+    weight: firestore.FieldValue.increment(weight),
+  })
+
+  // If data doesn't exist, create it
+  if (dataRef === null) {
+    const newDataRef = firestore().collection('data').doc()
+    const newDataSummaryRef = firestore()
+      .collection('summary')
+      .doc(newDataRef.id)
+
+    // Add the data and summary
+    const { count, length, ...otherData } = data
+    batch.set(newDataRef, { ...otherData, length: [length] })
+    batch.set(newDataRef.collection('data').doc(`${length}`), { count })
+    batch.set(newDataSummaryRef, { ...otherData, count, weight, cost })
+  } else {
+    // Data already exists, append to it
+
+    // Update the length array,
+    batch.update(dataRef, {
+      length: firestore.FieldValue.arrayUnion(data.length),
+    })
+
+    // Add the counts as well
+    const countRef = dataRef.collection('data').doc(`${data.length}`)
+    const currentData = await countRef.get()
+    if (!currentData.exists) {
+      // Create it
+      batch.set(countRef, { count: data.count })
+    } else {
+      // Update it
+      batch.update(countRef, {
+        count: firestore.FieldValue.increment(data.count),
+      })
+    }
+    // Also update the summary
+    batch.update(dataSummaryRef, {
       count: firestore.FieldValue.increment(data.count),
       cost: firestore.FieldValue.increment(cost),
       weight: firestore.FieldValue.increment(weight),
     })
-
-    // If data is null, create it
-    if (dataRef === null) {
-      const newDataRef = firestore().collection('data').doc()
-      const newDataSummaryRef = firestore()
-        .collection('summary')
-        .doc(newDataRef.id)
-
-      // Add data and summary
-      transaction.set(newDataRef, {
-        ...data,
-        length: data.length === -1 ? [] : Array(data.count).fill(data.length),
-        count: data.length === -1 ? data.count : 0,
-      })
-      transaction.set(newDataSummaryRef, {
-        grade: data.grade,
-        shape: data.shape,
-        dia: data.dia,
-        loc: data.loc,
-        cost: data.cost,
-        origin: data.origin,
-        color: data.color,
-        count: data.count,
-        weight: weight,
-        cost: cost,
-      })
-    } else {
-      // Data already exists, append to it
-
-      // If not a full length, append the new length to the data
-      if (data.length != -1) {
-        const length = dataSnap._data.length
-        console.log(`Overall data: `, dataSnap)
-        console.log(`Current lengths: `, dataSnap._data.length)
-        for (var i = 0; i < data.count; ++i) {
-          length.push(data.length)
-        }
-        transaction.update(dataRef, {
-          length: length,
-        })
-      } else {
-        // If a full length, add to the count
-        transaction.update(dataRef, {
-          count: firestore.FieldValue.increment(data.count),
-        })
-      }
-
-      // Update the data summary as well
-      transaction.update(dataSummaryRef, {
-        count: firestore.FieldValue.increment(data.count),
-        cost: firestore.FieldValue.increment(cost),
-        weight: firestore.FieldValue.increment(weight),
-      })
-    }
-  })
+  }
+  batch.commit()
 }
 
 export async function removeItems(data) {
@@ -199,73 +180,30 @@ export async function findIdToRemove(data) {
 
   if (dataQuery.empty) {
     return null
-  } else if (dataQuery.docs.length > 1) {
-    console.log('Multiple docs found')
-    // If more than one item found, check which ones can be used
-    // and return ids of all found docs
+  } else {
+    // Check which ones can be used
+    // and return details of all usable pieces
     let usableDocs = []
 
     dataQuery.forEach((doc) => {
-      const docData = doc.data()
+      // Find the usable lengths
+      const usableLengths = doc.data.length.filter(
+        (length) =>
+          data.length === -1 // If removing full lengths,
+            ? length === -1 // Only full lengths can be used
+            : length >= data.length || length === -1 // Else, larger and full pieces can be used
+      )
 
-      if (data.length === -1 && docData.count > 0) {
-        console.log('Removing full length')
-        // If removing full length, make sure there are full lengths to remove
-        // When removing full length, the only way to find multiple docs is to have different costs
-        usableDocs.push({ id: doc.id, cost: docData.cost, length: -1 })
-      } else if (data.length !== -1) {
-        console.log('Removing partial length')
-        // If removing partial length, make sure there is a cut piece large enough
-        for (const length of docData.length) {
-          if (
-            length >= data.length && // Make sure same length isn't duplicated
-            !usableDocs.map((a) => a.length).includes(length)
-          ) {
-            usableDocs.push({
-              id: doc.id,
-              length: length,
-              cost: docData.cost,
-            })
-          }
+      usableLengths.forEach(async (length) => {
+        // Make sure there are enough counts to remove
+        const lengthData = await doc.collection('data').doc(`${length}`).get()
+        if (lengthData.data().count >= data.count) {
+          usableDocs.push({ id: doc.id, cost: doc.data().cost, length: -1 })
         }
-        // Even full length can be used
-        if (docData.count > 0) {
-          usableDocs.push({
-            id: doc.id,
-            cost: docData.cost,
-            length: -1,
-          })
-        }
-      }
+      })
     })
 
     return usableDocs
-  } else {
-    console.log('Found single doc')
-    // When only one document is found,
-    // If removing cut piece, check if there are options
-    // If removing full piece, return the document details as is
-    if (data.length === -1) {
-      console.log('Removing full length')
-      return { id: dataQuery.docs[0].id }
-    } else {
-      console.log('Removing partial length')
-      const docData = dataQuery.docs[0].data()
-      let usableDocs = []
-
-      for (const length of docData.length) {
-        if (
-          length >= data.length &&
-          !usableDocs.map((a) => a.length).includes(length)
-        ) {
-          usableDocs.push({
-            id: dataQuery.docs[0].id,
-            length: length,
-          })
-        }
-      }
-      return usableDocs
-    }
   }
 }
 

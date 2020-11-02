@@ -1,6 +1,6 @@
 import { DataTable, List } from 'react-native-paper'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { getCounts, getGradeColor } from '../core/database'
+import { getDetails, getGradeColor } from '../core/database'
 
 import DataCell from '../components/DataCell'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -15,25 +15,32 @@ const DetailScreen = ({ route, navigation }) => {
   const valid = React.useContext(ValidContext)
 
   // Set header text
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     navigation.setOptions({
       title: `${dia} ${valid.grades[grade].text} ${valid.shapes[shape].text}`,
     })
   }, [])
 
   // Get counts for all locations and origins
-  const [counts, setCounts] = React.useState({ full: {}, partial: {} })
+  const [details, setDetails] = React.useState({
+    full: [],
+    partial: [],
+    color: {},
+  })
   React.useLayoutEffect(() => {
-    setCounts(getCounts(grade, shape, dia, valid))
+    async function getDetailsAsync() {
+      const details = await getDetails(grade, shape, dia, valid)
+      // console.log(`Got Details: `, details)
+      setDetails(details)
+    }
+    getDetailsAsync()
   }, [])
-  const full = counts.full
-  const partial = counts.partial
-
-  // Get colors for each location
-  const [colors, setColors] = React.useState({})
-  React.useLayoutEffect(() => {
-    setColors(getGradeColor(grade, shape, valid))
-  }, [])
+  const full = details.full
+  const partial = details.partial
+  const colors = details.color
+  // console.log(`Where Full is: (${full.length}) `, full)
+  // console.log(`Where Partial is: (${partial.length}) `, partial)
+  // console.log(`Where Color is: `, colors)
 
   return (
     <ScrollView style={styles.container}>
@@ -46,17 +53,36 @@ const DetailScreen = ({ route, navigation }) => {
             <DataTable.Title>Color</DataTable.Title>
           </DataTable.Header>
 
-          {Object.keys(colors).map((origin) => (
-            <DataTable.Row key={origin}>
-              <DataCell color={colors[origin].color} important>
-                {valid.origins[origin].text}
-              </DataCell>
-              <DataCell
-                style={{ backgroundColor: colors[origin].color, margin: 10 }}>
-                {/* {colors[origin].text} */}
-              </DataCell>
-            </DataTable.Row>
-          ))}
+          {Object.keys(colors).map((origin) =>
+            colors[origin].map((color) => (
+              <DataTable.Row key={`${origin}.${color}`}>
+                <DataCell
+                  color={valid.colors[color].color}
+                  style={{
+                    backgroundColor: valid.colors[color].bgColor,
+                    margin: 10,
+                  }}
+                  important>
+                  {valid.origins[origin].text}
+                </DataCell>
+                <View
+                  style={{
+                    backgroundColor: valid.colors[color].bgColor,
+                    margin: 5,
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <DataCell
+                    style={{
+                      backgroundColor: valid.colors[color].color,
+                      margin: 5,
+                    }}
+                  />
+                </View>
+              </DataTable.Row>
+            ))
+          )}
         </DataTable>
       </List.Accordion>
       <List.Accordion
@@ -68,23 +94,32 @@ const DetailScreen = ({ route, navigation }) => {
             <DataTable.Title>Location</DataTable.Title>
             <DataTable.Title numeric>Count</DataTable.Title>
           </DataTable.Header>
-          {Object.keys(full).map((origin) =>
-            Object.keys(full[origin]).map((loc) => (
-              <DataTable.Row key={`${origin}.${loc}`}>
-                <DataCell color={colors[origin].color}>
-                  {valid.origins[origin].text}
-                </DataCell>
-                <DataCell
-                  color={colors[origin].color}
-                  icon={valid.locs[loc].icon}>
-                  {valid.locs[loc].text}
-                </DataCell>
-                <DataCell numeric important>
-                  {full[origin][loc]}
-                </DataCell>
-              </DataTable.Row>
-            ))
-          )}
+          {full.map((item, index) => (
+            <DataTable.Row key={index}>
+              <DataCell
+                color={valid.colors[item.color].color}
+                style={{
+                  backgroundColor: valid.colors[item.color].bgColor,
+                  margin: 5,
+                }}
+                important>
+                {valid.origins[item.origin].text}
+              </DataCell>
+              <DataCell
+                color={valid.colors[item.color].color}
+                style={{
+                  backgroundColor: valid.colors[item.color].bgColor,
+                  margin: 5,
+                }}
+                icon={valid.locs[item.loc].icon}
+              >
+                {valid.locs[item.loc].text}
+              </DataCell>
+              <DataCell numeric important>
+                {item.count}
+              </DataCell>
+            </DataTable.Row>
+          ))}
         </DataTable>
       </List.Accordion>
 
@@ -97,23 +132,30 @@ const DetailScreen = ({ route, navigation }) => {
             <DataTable.Title>Location</DataTable.Title>
             <DataTable.Title numeric>Length</DataTable.Title>
           </DataTable.Header>
-          {Object.keys(partial).map((origin) =>
-            Object.keys(partial[origin]).map((loc) => (
-              <DataTable.Row key={`${origin}.${loc}`}>
-                <DataCell color={colors[origin].color}>
-                  {valid.origins[origin].text}
-                </DataCell>
-                <DataCell
-                  color={colors[origin].color}
-                  icon={valid.locs[loc].icon}>
-                  {valid.locs[loc].text}
-                </DataCell>
-                <DataCell numeric important>
-                  {`${partial[origin][loc].length}(x${partial[origin][loc].count})`}
-                </DataCell>
-              </DataTable.Row>
-            ))
-          )}
+          {partial.map((item, index) => (
+            <DataTable.Row key={index}>
+              <DataCell
+                color={valid.colors[item.color].color}
+                style={{
+                  backgroundColor: valid.colors[item.color].bgColor,
+                  margin: 10,
+                }}>
+                {valid.origins[item.origin].text}
+              </DataCell>
+              <DataCell
+                color={valid.colors[item.color].color}
+                style={{
+                  backgroundColor: valid.colors[item.color].bgColor,
+                  margin: 10,
+                }}
+                icon={valid.locs[item.loc].icon}>
+                {valid.locs[item.loc].text}
+              </DataCell>
+              <DataCell numeric important>
+                {`${item.length}(x${item.count})`}
+              </DataCell>
+            </DataTable.Row>
+          ))}
         </DataTable>
       </List.Accordion>
     </ScrollView>

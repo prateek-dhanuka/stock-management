@@ -1,5 +1,13 @@
-import { Dialog, List, Portal, Switch, Text } from 'react-native-paper'
-import { StyleSheet, ToastAndroid, View } from 'react-native'
+import {
+  DataTable,
+  Dialog,
+  List,
+  Button as PaperButton,
+  Portal,
+  Switch,
+  Text,
+} from 'react-native-paper'
+import { ScrollView, StyleSheet, ToastAndroid, View } from 'react-native'
 import { addItems, findIdToRemove, removeItems } from '../core/database'
 import { getItemHeader, getItemScreenColor } from '../core/utils'
 
@@ -27,6 +35,9 @@ const FilterScreen = ({ route, navigation }) => {
   const [dialogVisible, setDialogVisible] = React.useState(false)
   const showDialog = () => setDialogVisible(true)
   const hideDialog = () => setDialogVisible(false)
+  const [ids, setIds] = React.useState({})
+  const [selectedId, SelectId] = React.useState(null)
+  const [data, setData] = React.useState({})
 
   //Get Navbar data
   var color = getItemScreenColor(route.params.type)
@@ -88,6 +99,10 @@ const FilterScreen = ({ route, navigation }) => {
         ToastAndroid.show('Please Enter a Dia!', ToastAndroid.SHORT)
         return
       }
+      if (!selectedIsFull && selectedLength === null) {
+        ToastAndroid.show(`Please Enter a Length!`, ToastAndroid.SHORT)
+        return
+      }
     }
 
     const data = {
@@ -112,10 +127,12 @@ const FilterScreen = ({ route, navigation }) => {
 
     if (route.params.type === 'remove') {
       console.log('Going to remove', data)
+      setData(data)
       findIdToRemove(data)
         .then((ids) => {
-          console.log(`Found the following ids(${ids.length}): `, ids)
-          if (Array.isArray(ids)) {
+          // console.log(`Found the following ids(${ids.length}): `, ids)
+          if (Array.isArray(ids) && ids.length > 1) {
+            setIds(ids)
             setDialogVisible(true)
             return
           }
@@ -128,13 +145,59 @@ const FilterScreen = ({ route, navigation }) => {
     }
   }
 
+  const removeID = () => {
+    removeItems(ids[selectedId])
+    hideDialog()
+    navigation.navigate('Detail', data)
+  }
+
   return (
     <Background>
       <Portal>
-        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-          <Dialog.Title>
-            Found Multiple Items that match the Filter
-          </Dialog.Title>
+        <Dialog
+          visible={dialogVisible}
+          onDismiss={hideDialog}
+          style={{
+            position: 'absolute',
+            top: '0%',
+            height: '90%',
+          }}>
+          <Dialog.ScrollArea>
+            <Dialog.Title>
+              Found Multiple Items that match the Filter
+            </Dialog.Title>
+            <ScrollView contentContainerStyle={{ padding: 24 }}>
+              <DataTable>
+                <DataTable.Header>
+                  <DataTable.Title>Cost</DataTable.Title>
+                  <DataTable.Title numeric>Length</DataTable.Title>
+                </DataTable.Header>
+                {Object.keys(ids).map((id) => (
+                  <DataTable.Row
+                    key={id}
+                    style={
+                      selectedId === id ? { backgroundColor: color } : null
+                    }
+                    onPress={() => SelectId(id)}>
+                    <DataTable.Cell>
+                      {ids[id].cost === 0 ? 'Unknown' : ids[id].cost}
+                    </DataTable.Cell>
+                    <DataTable.Cell numeric>
+                      {ids[id].length === -1 ? 'Full' : ids[id].length}
+                    </DataTable.Cell>
+                  </DataTable.Row>
+                ))}
+              </DataTable>
+            </ScrollView>
+            <Dialog.Actions>
+              <PaperButton onPress={hideDialog} color={color}>
+                Cancel
+              </PaperButton>
+              <PaperButton onPress={removeID} color={color}>
+                Remove
+              </PaperButton>
+            </Dialog.Actions>
+          </Dialog.ScrollArea>
         </Dialog>
       </Portal>
       <View style={styles.topContainer}>

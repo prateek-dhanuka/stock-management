@@ -1,3 +1,4 @@
+import analytics from '@react-native-firebase/analytics'
 import { clean } from './utils'
 import firestore from '@react-native-firebase/firestore'
 
@@ -23,6 +24,9 @@ export async function getSummary({ grade, shape, dia, loc, origin }) {
 
     return clean(overallSummary.data())
   } else {
+    // Log data to firebase
+    await analytics().logEvent('summary', { grade, shape, dia, loc, origin })
+
     var query = firestore().collection('summary')
     if (grade !== null) {
       query = query.where('grade', '==', grade)
@@ -65,6 +69,9 @@ export async function getSummary({ grade, shape, dia, loc, origin }) {
 }
 
 export async function addItems(data) {
+  // Log data to firebase
+  await analytics().logEvent('add', data)
+
   // Reference to summary
   const summaryRef = firestore().collection('summary').doc('overall')
 
@@ -157,8 +164,44 @@ export async function addItems(data) {
 }
 
 export async function removeItems(data) {
-  // Reference to summary
-  const summaryRef = firestore().collection('summary').doc('overall')
+  //Log data to firebase
+  await analytics().logEvent('remove', data)
+
+  // Calculate summary data to remove
+  const weight =
+    (data.count *
+      Math.pow(data.dia, 2) *
+      (data.length == -1 ? 6000 : data.length)) /
+    (data.shape === 'round' ? 162000 : 127000)
+  const cost = weight * data.cost
+
+  const batch = firestore().batch()
+
+  // Decrement overall summary
+  const overallRef = firestore().collection('summary').doc('overall')
+  batch.update(overallRef, {
+    count: firestore.FieldValue.increment(-data.count),
+    cost: firestore.FieldValue.increment(-cost),
+    weight: firestore.FieldValue.increment(-weight),
+  })
+
+  // Decrement data and summary
+  const dataRef = firestore()
+    .collection('data')
+    .doc(data.id)
+    .collection('data')
+    .doc(`${data.length}`)
+  batch.update(dataRef, {
+    count: firestore.FieldValue.increment(-data.count),
+  })
+  const summaryRef = firestore().collection('summary').doc(data.id)
+  batch.update(summaryRef, {
+    count: firestore.FieldValue.increment(-data.count),
+    cost: firestore.FieldValue.increment(-cost),
+    weight: firestore.FieldValue.increment(-weight),
+  })
+
+  batch.commit()
 }
 
 export async function findIdToRemove(data) {
@@ -185,62 +228,77 @@ export async function findIdToRemove(data) {
     // and return details of all usable pieces
     let usableDocs = []
 
-    dataQuery.forEach((doc) => {
-      // Find the usable lengths
-      const usableLengths = doc.data.length.filter(
-        (length) =>
-          data.length === -1 // If removing full lengths,
-            ? length === -1 // Only full lengths can be used
-            : length >= data.length || length === -1 // Else, larger and full pieces can be used
-      )
+    await Promise.all(
+      dataQuery.docs.map(async (doc) => {
+        // Find the usable lengths
+        const usableLengths = doc.data().length.filter(
+          (length) =>
+            data.length === -1 // If removing full lengths,
+              ? length === -1 // Only full lengths can be used
+              : length >= data.length || length === -1 // Else, larger and full pieces can be used
+        )
 
-      usableLengths.forEach(async (length) => {
-        // Make sure there are enough counts to remove
-        const lengthData = await doc.collection('data').doc(`${length}`).get()
-        if (lengthData.data().count >= data.count) {
-          usableDocs.push({ id: doc.id, cost: doc.data().cost, length: -1 })
-        }
+        await Promise.all(
+          usableLengths.map(async (length) => {
+            const lengthData = await doc.ref
+              .collection('data')
+              .doc(`${length}`)
+              .get()
+
+            if (lengthData.data().count >= data.count) {
+              usableDocs.push({
+                ...data,
+                id: doc.id,
+                cost: doc.data().cost,
+                length: length,
+              })
+            }
+          })
+        )
       })
-    })
+    )
 
     return usableDocs
   }
 }
 
-export function getCounts(grade, shape, dia, valid) {
-  const origins = valid.origins
-  const locs = valid.locs
+export async function getDetails(grade, shape, dia) {
+  // Log data to firebase
+  await analytics().logEvent('detail', { grade, shape, dia })
 
-  const output = { full: {}, partial: {} }
-  Object.keys(origins).forEach((origin) => {
-    output['full'][origin] = {}
-    output['partial'][origin] = {}
-    Object.keys(locs).forEach((loc) => {
-      const full = Math.floor(10 * Math.random())
-      const partial = Math.floor(10 * Math.random())
-      for (let i = 0; i < partial; ++i) {
-        output['partial'][origin][loc] = {
-          length: Math.floor(6000 * Math.random()),
-          count: Math.floor(10 * Math.random()),
+  const dataSnap = await firestore()
+    .collection('data')
+    .where('grade', '==', grade)
+    .where('shape', '==', shape)
+    .where('dia', '==', dia)
+    .get()
+
+  const output = { full: [], partial: [], color: {} }
+  for (const doc of dataSnap.docs) {
+    const data = doc.data()
+    const origin = data.origin
+    const color = data.color
+    const lengths = data.length
+    const loc = data.loc
+    await Promise.all(
+      lengths.map(async (length) => {
+        const count = (
+          await doc.ref.collection('data').doc(`${length}`).get()
+        ).data().count
+
+        if (length == -1) {
+          output.full.push({ origin, loc, color, count })
+        } else {
+          output.partial.push({ origin, loc, color, count, length })
         }
-      }
-
-      output['full'][origin][loc] = full
-    })
-  })
-
-  return output
-}
-
-export function getGradeColor(grade, shape, valid) {
-  const origins = valid.origins
-  const colors = valid.colors
-
-  const output = {}
-  Object.keys(origins).forEach((origin) => {
-    const keys = Object.keys(colors)
-    output[origin] = colors[keys[Math.floor(Math.random() * keys.length)]]
-  })
+      })
+    )
+    if (output.color[origin] === undefined) {
+      output.color[origin] = [color]
+    } else {
+      output.color[origin] = [...new Set([...output.color[origin], color])]
+    }
+  }
 
   return output
 }

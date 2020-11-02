@@ -26,6 +26,15 @@ export async function getSummary({ grade, shape, dia, loc, origin }) {
   } else {
     // Log data to firebase
     await analytics().logEvent('summary', { grade, shape, dia, loc, origin })
+    // .then(
+    //   console.log(`Logged summary to firebase: `, {
+    //     grade,
+    //     shape,
+    //     dia,
+    //     loc,
+    //     origin,
+    //   })
+    // )
 
     var query = firestore().collection('summary')
     if (grade !== null) {
@@ -71,6 +80,7 @@ export async function getSummary({ grade, shape, dia, loc, origin }) {
 export async function addItems(data) {
   // Log data to firebase
   await analytics().logEvent('add', data)
+  // .then(console.log(`Logged add to firebase: `, data))
 
   // Reference to summary
   const summaryRef = firestore().collection('summary').doc('overall')
@@ -166,6 +176,7 @@ export async function addItems(data) {
 export async function removeItems(data) {
   //Log data to firebase
   await analytics().logEvent('remove', data)
+  // .then(console.log(`Logged remove to firebase: `, data))
 
   // Calculate summary data to remove
   const weight =
@@ -265,6 +276,7 @@ export async function findIdToRemove(data) {
 export async function getDetails(grade, shape, dia) {
   // Log data to firebase
   await analytics().logEvent('detail', { grade, shape, dia })
+  // .then(console.log(`Logged detail to firebase: `, { grade, shape, dia }))
 
   const dataSnap = await firestore()
     .collection('data')

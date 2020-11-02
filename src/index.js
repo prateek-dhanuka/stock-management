@@ -27,8 +27,13 @@ const Main = () => {
         if (previousRouteName !== currentRouteName) {
           await analytics().logScreenView({
             screen_name: currentRouteName,
-            screen_name: currentRouteName,
+            screen_class: currentRouteName,
           })
+          // .then(
+          //   console.log(
+          //     `Logged moving from ${previousRouteName} to ${currentRouteName}`
+          //   )
+          // )
         }
 
         routeNameRef.current = currentRouteName

@@ -363,11 +363,13 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.name.nativefirebase;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nativefirebase";
 				PRODUCT_NAME = nativefirebase;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+				TARGETED_DEVICE_FAMILY = 1;
+				CODE_SIGN_ENTITLEMENTS = D:\Prateek\JS\Stock\stock-management\ios\nativefirebase\nativefirebase.entitlements;
 			};
 			name = Debug;
 		};
@@ -386,10 +388,12 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.name.nativefirebase;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nativefirebase";
 				PRODUCT_NAME = nativefirebase;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+				TARGETED_DEVICE_FAMILY = 1;
+				CODE_SIGN_ENTITLEMENTS = D:\Prateek\JS\Stock\stock-management\ios\nativefirebase\nativefirebase.entitlements;
 			};
 			name = Release;
 		};
@@ -450,6 +454,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				CODE_SIGN_ENTITLEMENTS = D:\Prateek\JS\Stock\stock-management\ios\nativefirebase\nativefirebase.entitlements;
 			};
 			name = Debug;
 		};
@@ -503,6 +508,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
+				CODE_SIGN_ENTITLEMENTS = D:\Prateek\JS\Stock\stock-management\ios\nativefirebase\nativefirebase.entitlements;
 			};
 			name = Release;
 		};

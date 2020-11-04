@@ -1,5 +1,16 @@
-import { Button, Dialog, IconButton, Portal } from 'react-native-paper'
-import { StyleSheet, Text, View } from 'react-native'
+import {
+  Avatar,
+  Button,
+  Card,
+  Dialog,
+  IconButton,
+  Paragraph,
+  Portal,
+  Surface,
+  Text,
+  Title,
+} from 'react-native-paper'
+import { StyleSheet, View } from 'react-native'
 import { getItemHeader, getItemScreenColor } from '../core/utils'
 
 import Background from '../components/Background'
@@ -10,6 +21,7 @@ import React from 'react'
 import ValidContext from '../core/ValidContext'
 import { getSummary } from '../core/database'
 import { getSummaryHeader } from '../core/utils'
+import { theme } from '../core/theme'
 
 const SummaryScreen = ({ route, navigation }) => {
   // Summary filter dialog state
@@ -50,6 +62,7 @@ const SummaryScreen = ({ route, navigation }) => {
           <IconButton icon="filter-variant" size={20} onPress={showDialog} />
         </View>
       ),
+      headerLeft: () => {},
     })
   }, [valid, route.params])
 
@@ -112,28 +125,51 @@ const SummaryScreen = ({ route, navigation }) => {
       </Portal>
       <>
         <View style={styles.topContainer}>
-          <Text style={styles.summaryText}>
-            There are {summary.count} rods in stock
-          </Text>
-          <Text style={styles.summaryText}>
-            The combined weight is{' '}
-            {summary.weight === undefined
-              ? 0
-              : summary.weight.toLocaleString('en-IN')}
-            Kg
-          </Text>
-          <Text style={styles.summaryText}>
-            The estimated cost is{' '}
-            {summary.cost === undefined
-              ? 0
-              : summary.cost.toLocaleString('en-IN', {
-                  style: 'currency',
-                  currency: 'INR',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                  // maximumFractionDigits: 1,
-                })}
-          </Text>
+          <Card style={styles.card}>
+            <Card.Title
+              title={
+                summary.cost === undefined
+                  ? 0
+                  : summary.cost.toLocaleString('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                      // maximumFractionDigits: 1,
+                    })
+              }
+            />
+            <Card.Content>
+              <Text>Estimated Cost</Text>
+            </Card.Content>
+          </Card>
+          <View style={styles.horizontal}>
+            <View style={styles.vertical}>
+              <Card style={styles.card}>
+                <Card.Title
+                  title={`${
+                    summary.weight === undefined
+                      ? 0
+                      : summary.weight.toLocaleString('en-IN')
+                  } Kg`}
+                />
+                <Card.Content>
+                  <Text>Estimated Weight</Text>
+                </Card.Content>
+              </Card>
+            </View>
+            <View style={styles.vertical}>
+              <Card style={styles.card}>
+                <Card.Title title={summary.count} />
+                <Card.Content>
+                  <Text>Count</Text>
+                </Card.Content>
+              </Card>
+            </View>
+          </View>
+        </View>
+        <View style={styles.centerContainer}>
+          <View style={{ flex: 1 }} />
         </View>
         <View style={styles.bottomContainer}>
           <Button
@@ -144,22 +180,28 @@ const SummaryScreen = ({ route, navigation }) => {
             onPress={detailItem}>
             Detail Item
           </Button>
-          <Button
-            style={styles.button}
-            mode="contained"
-            color={getItemScreenColor('add')}
-            contentStyle={{ height: 50 }}
-            onPress={addItem}>
-            Add Item
-          </Button>
-          <Button
-            style={styles.button}
-            mode="contained"
-            color={getItemScreenColor('remove')}
-            contentStyle={{ height: 50 }}
-            onPress={removeItem}>
-            Remove Item
-          </Button>
+          <View style={styles.horizontal}>
+            <View style={styles.vertical}>
+              <Button
+                style={styles.button}
+                mode="contained"
+                color={getItemScreenColor('add')}
+                contentStyle={{ height: 50 }}
+                onPress={addItem}>
+                Add Item
+              </Button>
+            </View>
+            <View style={styles.vertical}>
+              <Button
+                style={styles.button}
+                mode="contained"
+                color={getItemScreenColor('remove')}
+                contentStyle={{ height: 50 }}
+                onPress={removeItem}>
+                Remove Item
+              </Button>
+            </View>
+          </View>
         </View>
       </>
     </Background>
@@ -173,23 +215,49 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     lineHeight: 40,
   },
+  surface: {
+    padding: 8,
+    height: 100,
+    width: '100%',
+    elevation: 4,
+  },
+  cardHeadText: {
+    color: 'rgba(0,0,0,0.32)',
+    fontSize: 16,
+  },
   button: {
-    margin: 12,
+    margin: 4,
+    alignSelf: 'stretch',
   },
   topContainer: {
-    flex: 1,
+    // flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
-  },
-  bottomContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
   },
   centerContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
+  },
+  bottomContainer: {
+    // flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    // alignSelf: 'center',
+  },
+  horizontal: {
+    // flex: 1,
+    flexDirection: 'row',
+    // justifyContent: 'space-evenly',
+    alignItems: 'center',
+    // alignSelf: 'center',
+  },
+  vertical: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  card: {
+    margin: 4,
   },
 })
 

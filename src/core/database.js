@@ -285,7 +285,7 @@ export async function getDetails(grade, shape, dia) {
     .where('dia', '==', dia)
     .get()
 
-  const output = { full: [], partial: [], color: {} }
+  const output = { full: [], partial: [], color: [] }
   for (const doc of dataSnap.docs) {
     const data = doc.data()
     const origin = data.origin
@@ -305,10 +305,16 @@ export async function getDetails(grade, shape, dia) {
         }
       })
     )
-    if (output.color[origin] === undefined) {
-      output.color[origin] = [color]
-    } else {
-      output.color[origin] = [...new Set([...output.color[origin], color])]
+    // if (output.color[origin] === undefined) {
+    //   output.color[origin] = [color]
+    // } else {
+    //   output.color[origin] = [...new Set([...output.color[origin], color])]
+    // }
+    if (
+      output.color.filter((e) => e.origin === origin && e.color === color)
+        .length <= 0
+    ) {
+      output.color.push({ origin, color })
     }
   }
 

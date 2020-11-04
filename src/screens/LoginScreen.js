@@ -31,17 +31,17 @@ const LoginScreen = ({ route, navigation }) => {
 
   const handleAppStateChange = (nextAppState) => {
     if (nextAppState === 'background') {
-      auth()
-        .signOut()
-        .then(
-          () => {
-            console.log('Signing out due to background!')
-            navigation.navigate('Login')
-          },
-          (error) => {
-            console.log(`Couldn't Sign out, ${error}`)
-          }
-        )
+      // auth()
+      //   .signOut()
+      //   .then(
+      //     () => {
+      //       console.log('Signing out due to background!')
+      //       navigation.navigate('Login')
+      //     },
+      //     (error) => {
+      //       console.log(`Couldn't Sign out, ${error}`)
+      //     }
+      //   )
     }
   }
 

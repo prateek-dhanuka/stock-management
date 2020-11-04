@@ -1,8 +1,17 @@
-import { ActivityIndicator, DataTable, List } from 'react-native-paper'
+import {
+  ActivityIndicator,
+  DataTable,
+  Dialog,
+  IconButton,
+  List,
+  Menu,
+  Portal,
+} from 'react-native-paper'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getDetails, getGradeColor } from '../core/database'
 
 import DataCell from '../components/DataCell'
+import { FlatGrid } from 'react-native-super-grid'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React from 'react'
 import ValidContext from '../core/ValidContext'
@@ -17,10 +26,20 @@ const DetailScreen = ({ route, navigation }) => {
   // show loading screen
   const [loading, setLoading] = React.useState(true)
 
-  // Set header text
+  // Color dialog state
+  const [dialogVisible, setDialogVisible] = React.useState(false)
+  const showDialog = () => setDialogVisible(true)
+  const hideDialog = () => setDialogVisible(false)
+
+  // Set Navbar
   React.useLayoutEffect(() => {
     navigation.setOptions({
       title: `${dia} ${valid.grades[grade].text} ${valid.shapes[shape].text}`,
+      headerRight: () => (
+        <View style={{ flexDirection: 'row' }}>
+          <IconButton icon="palette" size={20} onPress={showDialog} />
+        </View>
+      ),
     })
   }, [])
 
@@ -28,7 +47,7 @@ const DetailScreen = ({ route, navigation }) => {
   const [details, setDetails] = React.useState({
     full: [],
     partial: [],
-    color: {},
+    color: [],
   })
   React.useLayoutEffect(() => {
     async function getDetailsAsync() {
@@ -42,54 +61,53 @@ const DetailScreen = ({ route, navigation }) => {
   const full = details.full
   const partial = details.partial
   const colors = details.color
-  // console.log(`Where Full is: (${full.length}) `, full)
-  // console.log(`Where Partial is: (${partial.length}) `, partial)
-  // console.log(`Where Color is: `, colors)
+  console.log(
+    `Colors are `,
+    colors,
+    ' => ',
+    colors.map((color) => valid.colors[color.color])
+  )
 
   return (
     <>
-      <ScrollView style={styles.container}>
-        <List.Accordion
-          title="Color Details"
-          left={(props) => <List.Icon {...props} icon="palette" />}>
-          <DataTable>
-            <DataTable.Header>
-              <DataTable.Title>Origin</DataTable.Title>
-              <DataTable.Title>Color</DataTable.Title>
-            </DataTable.Header>
+      <Portal>
+        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+          <Dialog.Title>Color Summary</Dialog.Title>
+          <Dialog.Content>
+            <FlatGrid
+              data={colors}
+              itemDimension={100}
+              renderItem={({ item }) => {
+                const origin = valid.origins[item.origin].text
+                const bgColor = valid.colors[item.color].bgColor
+                const color = valid.colors[item.color].color
+                const icon = valid.colors[item.color].icon
 
-            {Object.keys(colors).map((origin) =>
-              colors[origin].map((color) => (
-                <DataTable.Row key={`${origin}.${color}`}>
-                  <DataCell
-                    color={valid.colors[color].color}
-                    style={{
-                      backgroundColor: valid.colors[color].bgColor,
-                      margin: 10,
+                return (
+                  <Menu.Item
+                    icon={(props) => {
+                      return (
+                        <>
+                          <View
+                            style={[
+                              styles.fillView,
+                              bgColor && { backgroundColor: bgColor },
+                            ]}
+                          />
+                          <Icon size={props.size} color={color} name={icon} />
+                        </>
+                      )
                     }}
-                    important>
-                    {valid.origins[origin].text}
-                  </DataCell>
-                  <View
-                    style={{
-                      backgroundColor: valid.colors[color].bgColor,
-                      margin: 5,
-                      flex: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <DataCell
-                      style={{
-                        backgroundColor: valid.colors[color].color,
-                        margin: 5,
-                      }}
-                    />
-                  </View>
-                </DataTable.Row>
-              ))
-            )}
-          </DataTable>
-        </List.Accordion>
+                    iconcolor={color}
+                    title={origin}
+                  />
+                )
+              }}
+            />
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+      <ScrollView style={styles.container}>
         <List.Accordion
           title="Full Length Details"
           left={(props) => <List.Icon {...props} icon="format-line-weight" />}>
@@ -161,6 +179,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  fillView: {
+    position: 'absolute',
+    top: 5,
+    left: 5,
+    width: 14,
+    height: 14,
   },
 })
 

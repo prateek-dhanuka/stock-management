@@ -1,4 +1,3 @@
-import { AppState } from 'react-native'
 import DetailScreen from './screens/DetailScreen'
 import FilterScreen from './screens/FilterScreen'
 import LoginScreen from './screens/LoginScreen'

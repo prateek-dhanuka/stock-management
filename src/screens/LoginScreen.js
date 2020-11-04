@@ -1,30 +1,56 @@
-import React, { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { emailValidator, passwordValidator } from '../core/utils'
 
+import { AppState } from 'react-native'
 import Background from '../components/Background'
 import Button from '../components/Button'
 import Header from '../components/Header'
+import React from 'react'
 import TextInput from '../components/TextInput'
 import auth from '@react-native-firebase/auth'
+import { firebase } from '@react-native-firebase/analytics'
 
 const LoginScreen = ({ route, navigation }) => {
   //Declare States here
-  const [email, setEmail] = useState({ value: '', error: '' })
-  const [password, setPassword] = useState({ value: '', error: '' })
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = React.useState({ value: '', error: '' })
+  const [password, setPassword] = React.useState({ value: '', error: '' })
+  const [loading, setLoading] = React.useState(false)
 
   // Set Options here
-  useEffect(() => {
+  React.useLayoutEffect(() => {
     navigation.setOptions({ title: 'Home screen', headerShown: false })
   }, [])
+
+  // Logout on background
+  React.useEffect(() => {
+    AppState.addEventListener('change', handleAppStateChange)
+    return () => {
+      AppState.removeEventListener('change', handleAppStateChange)
+    }
+  }, [])
+
+  const handleAppStateChange = (nextAppState) => {
+    if (nextAppState === 'background') {
+      auth()
+        .signOut()
+        .then(
+          () => {
+            console.log('Signing out due to background!')
+            navigation.navigate('Login')
+          },
+          (error) => {
+            console.log(`Couldn't Sign out, ${error}`)
+          }
+        )
+    }
+  }
 
   //Login pressed handler
   const onLoginPressed = async () => {
     if (loading) return
 
-    const emailError = emailValidator(email.value)
-    const passwordError = passwordValidator(password.value)
+    let emailError = emailValidator(email.value)
+    let passwordError = passwordValidator(password.value)
 
     if (emailError || passwordError) {
       setEmail({ ...email, error: emailError })
@@ -49,6 +75,7 @@ const LoginScreen = ({ route, navigation }) => {
         } else if (error.code === 'auth/wrong-password') {
           passwordError = error.code
         } else {
+          passwordError = error.code
           console.error(error)
         }
         if (emailError || passwordError) {
@@ -62,12 +89,14 @@ const LoginScreen = ({ route, navigation }) => {
 
   //Handle User state changes
   function onAuthStateChanged(user) {
-    navigation.navigate('Summary', { grade: null, shape: null, dia: null })
+    if (user !== null) {
+      navigation.navigate('Summary', { grade: null, shape: null, dia: null })
+    }
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
-    // return subscriber
+    return subscriber
   }, [])
 
   return (

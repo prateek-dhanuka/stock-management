@@ -9,13 +9,13 @@ import {
 } from 'react-native-paper'
 import { ScrollView, StyleSheet, ToastAndroid, View } from 'react-native'
 import { addItems, findIdToRemove, removeItems } from '../core/database'
-import { getItemHeader, getItemScreenColor } from '../core/utils'
 
 import Background from '../components/Background'
 import Button from '../components/Button'
 import ItemMenu from '../components/ItemMenu'
 import NumericInput from '../components/NumericInput'
 import React from 'react'
+import { getItemHeader } from '../core/utils'
 import { theme } from '../core/theme'
 
 const FilterScreen = ({ route, navigation }) => {
@@ -40,7 +40,7 @@ const FilterScreen = ({ route, navigation }) => {
   const [data, setData] = React.useState({})
 
   //Get Navbar data
-  var color = getItemScreenColor(route.params.type)
+  var color = theme.colors[route.params.type]
   var header_text = getItemHeader(route.params.type)
 
   // Set Navbar

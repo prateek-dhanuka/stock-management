@@ -37,19 +37,6 @@ export const getSummaryHeader = (params, valid) => {
   return header_text
 }
 
-export const getItemScreenColor = (type) => {
-  switch (type) {
-    case 'detail':
-      return '#1f00a3'
-    case 'add':
-      return '#008710'
-    case 'remove':
-      return '#791b1e'
-    default:
-      return null
-  }
-}
-
 export const getItemHeader = (type) => {
   switch (type) {
     case 'detail':

@@ -11,7 +11,6 @@ import {
   Title,
 } from 'react-native-paper'
 import { StyleSheet, View } from 'react-native'
-import { getItemHeader, getItemScreenColor } from '../core/utils'
 
 import Background from '../components/Background'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -72,7 +71,8 @@ const SummaryScreen = ({ route, navigation }) => {
   }
 
   const addItem = () => {
-    navigation.navigate('Filter', { type: 'add' })
+    // navigation.navigate('Filter', { type: 'add' })
+    navigation.navigate('Add', { type: 'add' })
   }
 
   const removeItem = () => {
@@ -175,7 +175,7 @@ const SummaryScreen = ({ route, navigation }) => {
           <Button
             style={styles.button}
             mode="contained"
-            color={getItemScreenColor('detail')}
+            color={theme.colors.detail}
             contentStyle={{ height: 50 }}
             onPress={detailItem}>
             Detail Item
@@ -185,7 +185,7 @@ const SummaryScreen = ({ route, navigation }) => {
               <Button
                 style={styles.button}
                 mode="contained"
-                color={getItemScreenColor('add')}
+                color={theme.colors.add}
                 contentStyle={{ height: 50 }}
                 onPress={addItem}>
                 Add Item
@@ -195,7 +195,7 @@ const SummaryScreen = ({ route, navigation }) => {
               <Button
                 style={styles.button}
                 mode="contained"
-                color={getItemScreenColor('remove')}
+                color={theme.colors.remove}
                 contentStyle={{ height: 50 }}
                 onPress={removeItem}>
                 Remove Item

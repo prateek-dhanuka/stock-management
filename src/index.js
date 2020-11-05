@@ -1,3 +1,4 @@
+import AddRemoveScreen from './screens/AddRemoveScreen'
 import DetailScreen from './screens/DetailScreen'
 import FilterScreen from './screens/FilterScreen'
 import LoginScreen from './screens/LoginScreen'
@@ -28,11 +29,6 @@ const Main = () => {
             screen_name: currentRouteName,
             screen_class: currentRouteName,
           })
-          // .then(
-          //   console.log(
-          //     `Logged moving from ${previousRouteName} to ${currentRouteName}`
-          //   )
-          // )
         }
 
         routeNameRef.current = currentRouteName
@@ -42,6 +38,7 @@ const Main = () => {
         <Stack.Screen name="Summary" component={SummaryScreen} />
         <Stack.Screen name="Filter" component={FilterScreen} />
         <Stack.Screen name="Detail" component={DetailScreen} />
+        <Stack.Screen name="Add" component={AddRemoveScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

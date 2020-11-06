@@ -130,3 +130,5 @@ buck-out/
 web-build/
 
 # @end expo-cli
+
+android/app/google-services.json

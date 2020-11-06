@@ -66,20 +66,25 @@ const FlexedButtons = () => {
         })}
       </View>
       <Text style={styles.headText}>Select Origin</Text>
-      {Object.keys(valid.origins).map((origin, index) => {
-        const AddView = (props) => {
-          console.log(`Props are `, props)
-          return <View {...props}>{props.children}</View>
+      {Object.keys(valid.origins).map((origin, index, array) => {
+        if (index % 2 !== 0) {
+          return null
+        } else {
+          return (
+            <View style={styles.horizontalContainer} key={origin}>
+              <Surface style={[styles.buttonContainer, { height: width }]}>
+                <Text style={styles.buttonText}>
+                  {valid.origins[array[index]].text}
+                </Text>
+              </Surface>
+              <Surface style={[styles.buttonContainer, { height: width }]}>
+                <Text style={styles.buttonText}>
+                  {valid.origins[array[index + 1]].text}
+                </Text>
+              </Surface>
+            </View>
+          )
         }
-        return (
-          <AddView key={origin}>
-            <Surface style={[styles.buttonContainer, { height: width }]}>
-              <Text style={styles.buttonText}>
-                {valid.origins[origin].text}
-              </Text>
-            </Surface>
-          </AddView>
-        )
       })}
     </ScrollView>
   )
@@ -95,14 +100,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     // alignItems: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     paddingHorizontal: 2,
-    paddingBottom: 20,
   },
   buttonContainer: {
     flex: 1,
     margin: 3,
-    borderRadius: 20,
+    borderRadius: 10,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
@@ -112,7 +116,7 @@ const styles = StyleSheet.create({
   constantContainer: {
     // flex: 1,
     margin: 3,
-    borderRadius: 20,
+    borderRadius: 10,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
@@ -122,7 +126,7 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     margin: 3,
-    borderRadius: 20,
+    borderRadius: 10,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,3 +1,3 @@
 ## Download the release APK from here
 
-[Download](https://prateek-dhanuka.github.io/stock-management/app-release.apk)
+[Download](https://github.com/prateek-dhanuka/stock-management/releases/latest/download/app-release.apk)

@@ -61,12 +61,12 @@ const DetailScreen = ({ route, navigation }) => {
   const full = details.full
   const partial = details.partial
   const colors = details.color
-  console.log(
-    `Colors are `,
-    colors,
-    ' => ',
-    colors.map((color) => valid.colors[color.color])
-  )
+  // console.log(
+  //   `Colors are `,
+  //   colors,
+  //   ' => ',
+  //   colors.map((color) => valid.colors[color.color])
+  // )
 
   return (
     <>

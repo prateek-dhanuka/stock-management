@@ -118,15 +118,15 @@ const FilterScreen = ({ route, navigation }) => {
     }
 
     if (route.params.type === 'add') {
-      console.log('Going to add ', data)
+      // console.log('Going to add ', data)
       addItems(data)
-        .then(() => console.log(`Added item via a transaction`))
+        // .then(() => console.log(`Added item via a transaction`))
         .catch((error) => console.error(error))
       navigation.navigate('Detail', data)
     }
 
     if (route.params.type === 'remove') {
-      console.log('Going to remove', data)
+      // console.log('Going to remove', data)
       setData(data)
       findIdToRemove(data)
         .then((ids) => {
@@ -135,6 +135,11 @@ const FilterScreen = ({ route, navigation }) => {
             setIds(ids)
             setDialogVisible(true)
             return
+          } else if (ids !== null) {
+            removeItems(data, ids[0])
+            navigation.navigate('Detail', data)
+          } else {
+            ToastAndroid.show('No items Found', ToastAndroid.SHORT)
           }
         })
         .catch((error) => console.error(error))
@@ -146,7 +151,7 @@ const FilterScreen = ({ route, navigation }) => {
   }
 
   const removeID = () => {
-    removeItems(ids[selectedId])
+    removeItems(data, ids[selectedId])
     hideDialog()
     navigation.navigate('Detail', data)
   }

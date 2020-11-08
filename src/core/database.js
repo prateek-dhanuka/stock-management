@@ -1,5 +1,6 @@
+import { clean, getWeight } from './utils'
+
 import analytics from '@react-native-firebase/analytics'
-import { clean } from './utils'
 import firestore from '@react-native-firebase/firestore'
 
 /**
@@ -54,7 +55,7 @@ export async function getSummary({ grade, shape, dia, loc, origin }) {
     }
     const summary = await query.get()
     if (summary.empty) {
-      console.log(`Did not find summary for given filter`)
+      // console.log(`Did not find summary for given filter`)
       return {
         cost: 0,
         count: 0,
@@ -115,11 +116,7 @@ export async function addItems(data) {
     dataID !== null ? firestore().collection('summary').doc(dataID) : null
 
   // Calculate summary data to add
-  const weight =
-    (data.count *
-      Math.pow(data.dia, 2) *
-      (data.length == -1 ? 6000 : data.length)) /
-    (data.shape === 'round' ? 162000 : 127000)
+  const weight = getWeight(data)
   const cost = weight * data.cost
 
   const batch = firestore().batch()
@@ -173,25 +170,27 @@ export async function addItems(data) {
   batch.commit()
 }
 
-export async function removeItems(data) {
+export async function removeItems(data, toRemove) {
+  // console.log(`Removing from `, toRemove)
   //Log data to firebase
-  await analytics().logEvent('remove', data)
+  await analytics().logEvent('remove', toRemove)
   // .then(console.log(`Logged remove to firebase: `, data))
 
   // Calculate summary data to remove
-  const weight =
-    (data.count *
-      Math.pow(data.dia, 2) *
-      (data.length == -1 ? 6000 : data.length)) /
-    (data.shape === 'round' ? 162000 : 127000)
+  const weight = getWeight(data)
   const cost = weight * data.cost
+
+  // console.log(`Reducing ${weight}Kg and Rs${cost}`)
 
   const batch = firestore().batch()
 
   // Decrement overall summary
   const overallRef = firestore().collection('summary').doc('overall')
   batch.update(overallRef, {
-    count: firestore.FieldValue.increment(-data.count),
+    count:
+      toRemove.length != data.length // If cutting pieces from old pieces,
+        ? firestore.FieldValue.increment(0) // then count doesn't decrease
+        : firestore.FieldValue.increment(-toRemove.count),
     cost: firestore.FieldValue.increment(-cost),
     weight: firestore.FieldValue.increment(-weight),
   })
@@ -199,18 +198,47 @@ export async function removeItems(data) {
   // Decrement data and summary
   const dataRef = firestore()
     .collection('data')
-    .doc(data.id)
+    .doc(toRemove.id)
     .collection('data')
-    .doc(`${data.length}`)
+    .doc(`${toRemove.length}`)
   batch.update(dataRef, {
-    count: firestore.FieldValue.increment(-data.count),
+    count: firestore.FieldValue.increment(-toRemove.count),
   })
-  const summaryRef = firestore().collection('summary').doc(data.id)
+  const summaryRef = firestore().collection('summary').doc(toRemove.id)
   batch.update(summaryRef, {
-    count: firestore.FieldValue.increment(-data.count),
+    count:
+      toRemove.length != data.length // If cutting pieces from old pieces,
+        ? firestore.FieldValue.increment(0) // then count doesn't decrease
+        : firestore.FieldValue.increment(-toRemove.count),
     cost: firestore.FieldValue.increment(-cost),
     weight: firestore.FieldValue.increment(-weight),
   })
+
+  // If cutting a piece, increase count for cut piece
+  if (toRemove.length != data.length) {
+    const newLength =
+      (toRemove.length === -1 ? 6000 : toRemove.length) - data.length
+
+    // console.log(`Cut to length ${newLength}`)
+
+    const countRef = firestore()
+      .collection('data')
+      .doc(toRemove.id)
+      .collection('data')
+      .doc(`${newLength}`)
+    const currentData = await countRef.get()
+
+    if (!currentData.exists) {
+      // Data doesn't exist, create it
+      // console.log(`Creating the data for ${newLength}`)
+      batch.set(countRef, { count: data.count })
+    } else {
+      // console.log(`Updating the data for ${newLength}`)
+      batch.update(countRef, {
+        count: firestore.FieldValue.increment(data.count),
+      })
+    }
+  }
 
   batch.commit()
 }

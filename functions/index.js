@@ -9,7 +9,7 @@ exports.helloWorld = functions.database
 
     if (data) {
       // The received data
-      console.log(`Retrieved data content: `, data)
+      // console.log(`Retrieved data content: `, data)
 
       const weight =
         (data.count *
@@ -27,7 +27,7 @@ exports.helloWorld = functions.database
         .once('value', (snapshot) => {
           // Current summary
           summary = snapshot.val()
-          console.log(`Current summary: `, summary)
+          // console.log(`Current summary: `, summary)
 
           // Add the current data
           summary.count += data.count

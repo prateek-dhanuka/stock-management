@@ -72,7 +72,7 @@ const SummaryScreen = ({ route, navigation }) => {
 
   const addItem = () => {
     // navigation.navigate('Filter', { type: 'add' })
-    navigation.navigate('Add', { type: 'add' })
+    navigation.navigate('Filter', { type: 'add' })
   }
 
   const removeItem = () => {
@@ -86,6 +86,8 @@ const SummaryScreen = ({ route, navigation }) => {
       grade: grade,
       shape: shape,
       dia: dia,
+      loc: loc,
+      origin: origin,
     })
   }
 
@@ -93,8 +95,16 @@ const SummaryScreen = ({ route, navigation }) => {
     SelectGrade(null)
     SelectDia(null)
     SelectShape(null)
+    SelectLoc(null)
+    SelectOrigin(null)
     hideDialog()
-    navigation.setParams({ grade: null, shape: null, dia: null })
+    navigation.setParams({
+      grade: null,
+      shape: null,
+      dia: null,
+      loc: null,
+      origin: null,
+    })
   }
 
   return (

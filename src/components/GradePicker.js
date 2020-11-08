@@ -8,7 +8,7 @@ const GradePicker = ({ selected, Select, color, selectedColor }) => {
   // Valid grades
   const { grades } = React.useContext(ValidContext)
 
-  console.log(`Selected color: ${selectedColor}, Main color: ${color}`)
+  // console.log(`Selected color: ${selectedColor}, Main color: ${color}`)
 
   return (
     <ScrollView
@@ -24,7 +24,7 @@ const GradePicker = ({ selected, Select, color, selectedColor }) => {
             selected={selected === grade ? true : false}
             selectedColor={selectedColor}
             onPress={() => {
-              console.log(`Selected ${grade}`)
+              // console.log(`Selected ${grade}`)
               Select(grade)
             }}
             textStyle={{ color: selectedColor }}

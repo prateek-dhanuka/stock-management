@@ -21,16 +21,28 @@ export const nameValidator = (name) => {
 
 export const getSummaryHeader = (params, valid) => {
   var header_text = 'Summary'
-  if (params.grade !== null || params.shape !== null || params.dia !== null) {
+  if (
+    params.grade !== null ||
+    params.shape !== null ||
+    params.dia !== null ||
+    params.loc !== null ||
+    params.origin !== null
+  ) {
     header_text = ''
-    if (params.dia != null) {
+    if (params.dia !== null) {
       header_text += `${params.dia} `
     }
-    if (params.grade != null) {
+    if (params.grade !== null) {
       header_text += `${valid.grades[params.grade].text} `
     }
-    if (params.shape != null) {
+    if (params.shape !== null) {
       header_text += `${valid.shapes[params.shape].text}`
+    }
+    if (params.loc !== null) {
+      header_text += `@${valid.locs[params.loc].text}`
+    }
+    if (params.origin !== null) {
+      header_text += `(${valid.origins[params.origin].text})`
     }
     // header_text = header_text.slice(0, -1)
   }
@@ -56,4 +68,17 @@ export const clean = ({ cost, count, weight }) => {
     count: Math.round(count),
     weight: Math.round(weight),
   }
+}
+
+export const getWeight = (data) => {
+  const weight =
+    ((data.dia * data.dia) / (data.shape === '0' ? 162000 : 127000)) * // 0 is round
+    data.count *
+    (data.length === -1 ? 6000 : data.length)
+  // console.log(`Dia^2 = ${dia2}`)
+  // console.log(`Weight Per meter = ${weightPerMeter}`)
+  // console.log(
+  //   `Weight for ${data.count} * Dia ${data.dia} ${data.shape} length ${data.length} is ${weight}`
+  // )
+  return weight
 }

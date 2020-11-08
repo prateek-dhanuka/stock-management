@@ -31,17 +31,17 @@ const LoginScreen = ({ route, navigation }) => {
 
   const handleAppStateChange = (nextAppState) => {
     if (nextAppState === 'background') {
-      // auth()
-      //   .signOut()
-      //   .then(
-      //     () => {
-      //       console.log('Signing out due to background!')
-      //       navigation.navigate('Login')
-      //     },
-      //     (error) => {
-      //       console.log(`Couldn't Sign out, ${error}`)
-      //     }
-      //   )
+      auth()
+        .signOut()
+        .then(
+          () => {
+            // console.log('Signing out due to background!')
+            navigation.navigate('Login')
+          },
+          (error) => {
+            // console.log(`Couldn't Sign out, ${error}`)
+          }
+        )
     }
   }
 
@@ -63,7 +63,7 @@ const LoginScreen = ({ route, navigation }) => {
     auth()
       .signInWithEmailAndPassword(email.value, password.value)
       .then(() => {
-        console.log('Signed In!')
+        // console.log('Signed In!')
       })
       .catch((error) => {
         if (error.code === 'auth/invalid-email') {
@@ -90,7 +90,13 @@ const LoginScreen = ({ route, navigation }) => {
   //Handle User state changes
   function onAuthStateChanged(user) {
     if (user !== null) {
-      navigation.navigate('Summary', { grade: null, shape: null, dia: null })
+      navigation.navigate('Summary', {
+        grade: null,
+        shape: null,
+        dia: null,
+        origin: null,
+        loc: null,
+      })
     }
   }
 

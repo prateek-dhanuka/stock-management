@@ -8,13 +8,16 @@ import Header from '../components/Header'
 import React from 'react'
 import TextInput from '../components/TextInput'
 import auth from '@react-native-firebase/auth'
-import { firebase } from '@react-native-firebase/analytics'
+import { useFocusEffect } from '@react-navigation/native'
+
+let passwordRef = null
 
 const LoginScreen = ({ route, navigation }) => {
   //Declare States here
   const [email, setEmail] = React.useState({ value: '', error: '' })
   const [password, setPassword] = React.useState({ value: '', error: '' })
   const [loading, setLoading] = React.useState(false)
+  // const passwordRef = React.createRef()
 
   // Set Options here
   React.useLayoutEffect(() => {
@@ -28,6 +31,15 @@ const LoginScreen = ({ route, navigation }) => {
       AppState.removeEventListener('change', handleAppStateChange)
     }
   }, [])
+
+  // When coming back to Login screen, remove password
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Resetting passowrd!')
+      setPassword({ value: '', error: '' })
+      passwordRef.setNativeProps({ text: '' })
+    }, [])
+  )
 
   const handleAppStateChange = (nextAppState) => {
     if (nextAppState === 'background') {
@@ -132,6 +144,7 @@ const LoginScreen = ({ route, navigation }) => {
           errorText={password.error}
           secureTextEntry
           autoCapitalize="none"
+          ref={(component) => (passwordRef = component)}
         />
       </View>
       <View style={styles.bottomContainer}>

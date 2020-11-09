@@ -12,6 +12,7 @@ import {
 } from 'react-native-paper'
 import { StyleSheet, View } from 'react-native'
 
+import { BackHandler } from 'react-native'
 import Background from '../components/Background'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import ItemMenu from '../components/ItemMenu'
@@ -38,6 +39,7 @@ const SummaryScreen = ({ route, navigation }) => {
   // Summary
   const [summary, setSummary] = React.useState({})
 
+  // Get the summary from the db
   React.useEffect(() => {
     async function summaryFunc() {
       const summaryData = await getSummary({ grade, shape, dia, loc, origin })
@@ -45,6 +47,21 @@ const SummaryScreen = ({ route, navigation }) => {
     }
     summaryFunc()
   }, [grade, shape, dia, loc, origin])
+
+  // Exit app on back
+  React.useEffect(() => {
+    navigation.addListener(
+      'beforeRemove',
+      (e) => {
+        // Exit App
+        BackHandler.exitApp()
+
+        // Prevent default behavior of leaving the screen
+        e.preventDefault()
+      },
+      [navigation]
+    )
+  })
 
   // Valid states
   const valid = React.useContext(ValidContext)
